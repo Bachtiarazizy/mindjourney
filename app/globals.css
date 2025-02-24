@@ -3,25 +3,57 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary: #ffffff;
+  --secondary: #222222;
+  --background: #ffe2eb;
+  --foreground: #f4f4f4;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    @apply text-secondary bg-primary font-geologica;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-prosto;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .paragraph-1 {
+    @apply text-[#222222] font-geologica text-base leading-6;
+  }
+
+  .heading-1 {
+    @apply text-[#222222] font-prosto text-[72px] leading-[82px] uppercase;
+  }
+
+  .button-1 {
+    @apply inline-flex;
+    padding: 10px 35px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 30px;
+    border: 1px solid var(--secondary);
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .font-prosto {
+    font-family: var(--font-prosto-one), system-ui, sans-serif;
+  }
+
+  .font-geologica {
+    font-family: var(--font-geologica), system-ui, sans-serif;
   }
 }
