@@ -42,10 +42,18 @@ function BlogCard({ post, isFeatured = false }: BlogCardProps) {
   });
 
   return (
-    <article className={`bg-primary rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow h-full`}>
+    <article className="bg-primary rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow h-full">
       <Link href={`/blog/${post.slug.current}`} className="h-full flex flex-col">
         <div className="relative">
-          {post.mainImage && <img src={urlForImage(post.mainImage).url()} alt={post.mainImage.alt || post.title} className={`w-full object-cover ${isFeatured ? "h-[400px]" : "h-[200px]"}`} />}
+          {post.mainImage && (
+            <img
+              src={urlForImage(post.mainImage)
+                .width(isFeatured ? 800 : 400)
+                .url()}
+              alt={post.mainImage.alt || post.title}
+              className={`w-full object-cover ${isFeatured ? "h-[400px]" : "h-[200px]"}`}
+            />
+          )}
           {post.category && <span className="absolute top-4 left-4 bg-background px-4 py-1 rounded-full text-secondary font-geologica text-sm">{post.category.title}</span>}
         </div>
 
@@ -66,7 +74,7 @@ function BlogCard({ post, isFeatured = false }: BlogCardProps) {
   );
 }
 
-// Blog Section query with revalidation options
+// Blog Section query with simpler options and limited fields
 const BLOG_POSTS_QUERY = `*[_type == "post" && defined(slug.current) && !(_id in path('drafts.**'))]|order(publishedAt desc)[0...3]{
   _id,
   title,
@@ -74,8 +82,7 @@ const BLOG_POSTS_QUERY = `*[_type == "post" && defined(slug.current) && !(_id in
   excerpt,
   mainImage {
     asset->{
-      _id,
-      url
+      _id
     },
     alt
   },
@@ -88,13 +95,12 @@ const BLOG_POSTS_QUERY = `*[_type == "post" && defined(slug.current) && !(_id in
 
 // Main Blog Section Component
 export default async function BlogSection() {
-  // Server component fetching data with no-cache to ensure fresh data
+  // Choose ONE caching strategy, not both
   const posts = await client.fetch<Post[]>(
     BLOG_POSTS_QUERY,
     {},
     {
-      cache: "no-store", // Disable caching to always get fresh content
-      next: { revalidate: 60 }, // Alternatively, revalidate every 60 seconds
+      next: { revalidate: 60 }, // Using ISR with 60-second revalidation
     }
   );
 

@@ -3,12 +3,12 @@
 import React from "react";
 import { notFound } from "next/navigation";
 import { SanityDocument } from "next-sanity";
-import { client } from "@/sanity/client";
-import { urlForImage } from "@/sanity/image";
 import { PortableText } from "@portabletext/react";
 import Link from "next/link";
+import { urlForImage } from "@/sanity/image";
+import { sanityFetch } from "@/lib/sanity-fetch"; // Import the optimized fetch function
 
-// Type definitions
+// Type definitions remain the same
 interface Post extends SanityDocument {
   title: string;
   slug: {
@@ -25,7 +25,7 @@ interface Post extends SanityDocument {
   body: any; // PortableText content
   category: {
     title: string;
-    _id: string; // Added _id property
+    _id: string;
   };
   publishedAt: string;
   readTime: number;
@@ -36,11 +36,11 @@ interface Post extends SanityDocument {
         _ref: string;
       };
     };
-    bio?: any[]; // Portable Text array, not a string
+    bio?: any[]; // Portable Text array
   };
 }
 
-// Components for the PortableText
+// Components for the PortableText remain the same
 const ptComponents = {
   types: {
     image: ({ value }: any) => {
@@ -83,7 +83,7 @@ const ptComponents = {
   },
 };
 
-// Simplified components for compact bio rendering
+// Simplified components for compact bio rendering remains the same
 const bioComponents = {
   block: {
     normal: ({ children }: any) => <span>{children}</span>,
@@ -95,7 +95,7 @@ const bioComponents = {
   },
 };
 
-// Get post query - Modified to include category._id
+// GROQ queries remain the same
 const POST_QUERY = `*[_type == "post" && slug.current == $slug && !(_id in path('drafts.**'))][0]{
   _id,
   title,
@@ -123,7 +123,6 @@ const POST_QUERY = `*[_type == "post" && slug.current == $slug && !(_id in path(
   }
 }`;
 
-// Query for related posts
 const RELATED_POSTS_QUERY = `*[_type == "post" && category._ref == $categoryId && slug.current != $currentSlug && !(_id in path('drafts.**'))][0...4]{
   _id,
   title,
@@ -139,7 +138,6 @@ const RELATED_POSTS_QUERY = `*[_type == "post" && category._ref == $categoryId &
   readTime
 }`;
 
-// Alternative query for related posts by category title
 const RELATED_BY_CATEGORY_TITLE_QUERY = `*[_type == "post" && references(*[_type == "category" && title == $categoryTitle]._id) && slug.current != $currentSlug && !(_id in path('drafts.**'))][0...4]{
   _id,
   title,
@@ -155,10 +153,15 @@ const RELATED_BY_CATEGORY_TITLE_QUERY = `*[_type == "post" && references(*[_type
   readTime
 }`;
 
-// Function to generate metadata for the page
+// Function to generate metadata for the page - optimized
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   try {
-    const post = await client.fetch<Post>(POST_QUERY, { slug: params.slug });
+    const post = await sanityFetch<Post>({
+      query: POST_QUERY,
+      params: { slug: params.slug },
+      revalidate: 60, // Cache for 1 minute
+      tags: [`post-${params.slug}`],
+    });
 
     if (!post) {
       return {
@@ -183,20 +186,21 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-// Function to generate static params for build time
+// Function to generate static params for build time - optimized to limit posts
 export async function generateStaticParams() {
-  const posts = await client.fetch<Post[]>(
-    `*[_type == "post" && defined(slug.current) && !(_id in path('drafts.**'))]{
-      slug
-    }`
-  );
+  const posts = await sanityFetch<{ slug: { current: string } }[]>({
+    query: `*[_type == "post" && defined(slug.current) && !(_id in path('drafts.**'))][0...20]{
+      "slug": slug.current
+    }`,
+    revalidate: 3600, // Cache for 1 hour
+  });
 
   return posts.map((post) => ({
     slug: post.slug.current,
   }));
 }
 
-// Related Post Card Component
+// Related Post Card Component remains the same
 function RelatedPostCard({ post }: { post: Post }) {
   // Format date
   const formattedDate = new Date(post.publishedAt).toLocaleDateString("en-US", {
@@ -224,39 +228,45 @@ function RelatedPostCard({ post }: { post: Post }) {
   );
 }
 
-// Main blog post page component
+// Main blog post page component - optimized
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
-  const post = await client.fetch<Post>(
-    POST_QUERY,
-    { slug: params.slug },
-    {
-      cache: "no-store", // Disable caching to ensure fresh content
-      next: { revalidate: 60 }, // Alternative: revalidate every 60 seconds
-    }
-  );
+  // Fetch the post with optimized caching
+  const post = await sanityFetch<Post>({
+    query: POST_QUERY,
+    params: { slug: params.slug },
+    revalidate: 60, // Revalidate content every minute
+    tags: [`post-${params.slug}`],
+  });
 
   if (!post) {
     notFound();
   }
 
-  // Fetch related posts
-  let relatedPosts: Post[] = [];
+  // Fetch related posts in parallel with the main post
+  const relatedPostsPromise = post.category
+    ? post.category._id
+      ? sanityFetch<Post[]>({
+          query: RELATED_POSTS_QUERY,
+          params: {
+            categoryId: post.category._id,
+            currentSlug: post.slug.current,
+          },
+          revalidate: 300, // Cache related posts for 5 minutes
+          tags: [`category-${post.category._id}`],
+        })
+      : sanityFetch<Post[]>({
+          query: RELATED_BY_CATEGORY_TITLE_QUERY,
+          params: {
+            categoryTitle: post.category.title,
+            currentSlug: post.slug.current,
+          },
+          revalidate: 300,
+          tags: [`category-${post.category.title}`],
+        })
+    : Promise.resolve([]);
 
-  if (post.category) {
-    if (post.category._id) {
-      // Use category ID if available
-      relatedPosts = await client.fetch<Post[]>(RELATED_POSTS_QUERY, {
-        categoryId: post.category._id,
-        currentSlug: post.slug.current,
-      });
-    } else if (post.category.title) {
-      // Fallback to category title if ID is not available
-      relatedPosts = await client.fetch<Post[]>(RELATED_BY_CATEGORY_TITLE_QUERY, {
-        categoryTitle: post.category.title,
-        currentSlug: post.slug.current,
-      });
-    }
-  }
+  // Await the related posts query result
+  const relatedPosts = await relatedPostsPromise;
 
   // Format date
   const formattedDate = new Date(post.publishedAt).toLocaleDateString("en-US", {
@@ -268,7 +278,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   return (
     <main className="bg-primary min-h-screen">
       {/* Article content with sidebar */}
-      <div className="container mx-auto px-4 py-16 max-w-6xl">
+      <div className="container mx-auto px-4 py-20 max-w-6xl">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Main content - Left side */}
           <article className="lg:w-2/3">
