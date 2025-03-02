@@ -5,8 +5,8 @@ import Link from "next/link";
 // Function to generate metadata for the page
 export async function generateMetadata() {
   return {
-    title: "About Me | My Personal Journey",
-    description: "Learn more about who I am, my experience, and what drives me",
+    title: "About Me | Azka Musfirah",
+    description: "Learn more about Azka Musfirah, her community service experience, and psychology background",
   };
 }
 
@@ -54,35 +54,30 @@ function InterestCard({ icon, title }: { icon: string; title: string }) {
 export default function AboutPage() {
   // Static data for skills
   const skills = [
-    { id: 1, name: "Web Development", level: 90 },
-    { id: 2, name: "UI/UX Design", level: 85 },
-    { id: 3, name: "Content Writing", level: 80 },
-    { id: 4, name: "Photography", level: 75 },
-    { id: 5, name: "Digital Marketing", level: 70 },
+    { id: 1, name: "Volunteer Management", level: 90 },
+    { id: 2, name: "Community Engagement", level: 85 },
+    { id: 3, name: "Media Management", level: 80 },
+    { id: 4, name: "Psychology", level: 85 },
+    { id: 5, name: "Creative Content", level: 75 },
   ];
 
   // Static data for experience
   const experiences = [
     {
       id: 1,
-      period: "2021 - Present",
-      role: "Front-end Developer",
-      company: "Tech Innovations Inc.",
-      description: "Leading front-end development for various client projects. Specializing in React, Next.js, and TypeScript to create responsive and accessible web applications.",
+      period: "Current",
+      role: "Social and Community Service Department",
+      company: "PPI Turki",
+      description:
+        "Leading the 'Mentari in Turkey' program focused on fostering community involvement and social impact through strategic volunteer management. Planning and implementing community service activities that address the needs of both Indonesian students and the local Turkish community.",
     },
     {
       id: 2,
-      period: "2018 - 2021",
-      role: "Web Designer",
-      company: "Creative Solutions Agency",
-      description: "Designed and developed websites for small to medium businesses. Collaborated with marketing teams to create cohesive brand experiences across digital platforms.",
-    },
-    {
-      id: 3,
-      period: "2016 - 2018",
-      role: "Freelance Designer",
-      company: "Self-employed",
-      description: "Worked with a variety of clients on web design, branding, and digital marketing projects. Built a portfolio of diverse work across multiple industries.",
+      period: "Current",
+      role: "Media and Creative Manager",
+      company: "Radio PPI Turki",
+      description:
+        "Enhancing Radio PPI Turki's presence amongst Indonesians in Turkey through creative media strategies and compelling content. Developing innovative approaches to engage the Indonesian community in Turkey through various media channels.",
     },
   ];
 
@@ -90,28 +85,22 @@ export default function AboutPage() {
   const education = [
     {
       id: 1,
-      period: "2014 - 2016",
-      role: "Master's in Interactive Media",
-      company: "Design University",
-      description: "Focused on interactive design, user experience, and emerging technologies. Thesis project explored the intersection of web design and accessibility.",
-    },
-    {
-      id: 2,
-      period: "2010 - 2014",
-      role: "Bachelor's in Computer Science",
-      company: "Tech State University",
-      description: "Studied programming fundamentals, web development, and graphic design. Active member of the Web Development Club and organized campus hackathons.",
+      period: "Current",
+      role: "Psychology and Guidance Counselling",
+      company: "Sivas Cumhuriyet Üniversitesi",
+      description:
+        "Studying psychology with a focus on guidance counselling, developing expertise in understanding human behavior and providing support to individuals. Applying psychological principles to enhance community service approaches.",
     },
   ];
 
   // Static data for interests
   const interests = [
-    { id: 1, icon: "📷", title: "Photography" },
-    { id: 2, icon: "✈️", title: "Travel" },
-    { id: 3, icon: "📚", title: "Reading" },
-    { id: 4, icon: "🎮", title: "Gaming" },
-    { id: 5, icon: "🏃", title: "Running" },
-    { id: 6, icon: "🎵", title: "Music" },
+    { id: 1, icon: "👥", title: "Community Service" },
+    { id: 2, icon: "🧠", title: "Psychology" },
+    { id: 3, icon: "🎙️", title: "Media" },
+    { id: 4, icon: "✈️", title: "Cultural Exchange" },
+    { id: 5, icon: "🤝", title: "Volunteer Work" },
+    { id: 6, icon: "📝", title: "Content Creation" },
   ];
 
   return (
@@ -120,7 +109,7 @@ export default function AboutPage() {
         {/* Page Header */}
         <header className="mb-16 text-center">
           <h1 className="font-prosto text-4xl md:text-5xl text-secondary font-normal mb-6">About Me</h1>
-          <p className="font-geologica text-secondary/80 max-w-2xl mx-auto">Developer, designer, and creative thinker sharing my journey and insights</p>
+          <p className="font-geologica text-secondary/80 max-w-2xl mx-auto">Community service leader, media manager, and psychology student dedicated to social impact</p>
         </header>
 
         <div className="flex flex-col lg:flex-row gap-12">
@@ -130,24 +119,24 @@ export default function AboutPage() {
             <section className="mb-16">
               <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
                 <div className="shrink-0">
-                  <img src="/api/placeholder/300/300" alt="Profile picture" className="w-48 h-48 rounded-full object-cover border-4 border-accent/20" />
+                  <img src="/azka.jpg" alt="Profile picture" className="w-48 h-48 rounded-full object-cover border-4 border-accent/20" />
                 </div>
                 <div>
-                  <h2 className="font-prosto text-2xl text-secondary mb-4 text-center md:text-left">Hello, I&apos;m Alex Morgan</h2>
+                  <h2 className="font-prosto text-2xl text-secondary mb-4 text-center md:text-left">Hello, I&apos;m Azka Musfirah</h2>
                   <div className="space-y-4 font-geologica text-secondary/80">
                     <p>
-                      I&apos;m a passionate front-end developer and designer with over 7 years of experience creating beautiful, functional websites and applications. Currently based in Seattle, I enjoy combining technical skills with
-                      creative thinking to build digital experiences that connect with people.
+                      I&apos;m passionate about community service and social impact with a focus on volunteer management. Currently based in Turkey, I lead the &quot;Mentari in Turkey&quot; program at PPI Turki while studying Psychology and
+                      Guidance Counselling at Sivas Cumhuriyet Üniversitesi.
                     </p>
                     <p>
-                      My journey in web development began during college when I built my first portfolio website. What started as a hobby quickly evolved into a career that I&apos;m deeply passionate about. I love the constant learning and
-                      evolution that comes with working in tech.
+                      My work involves planning and implementing community service activities that address the needs of both Indonesian students and the local Turkish community. I partner with a vibrant team to innovate and amplify our
+                      outreach and effectiveness.
                     </p>
+                    <p>Additionally, as the Media and Creative Manager at Radio PPI Turki, I work on enhancing our presence amongst Indonesians in Turkey through creative media strategies and compelling content development.</p>
                     <p>
-                      When I&apos;m not coding or designing, you&apos;ll find me exploring the outdoors with my camera, trying new coffee shops, or getting lost in a good book. I believe that these diverse interests help fuel my creativity
-                      and bring fresh perspectives to my work.
+                      My academic pursuit in Psychology continuously informs my approach to community service, ensuring compassionate and culturally sensitive engagement in all my initiatives. I believe in creating meaningful connections
+                      and supporting both the Indonesian and Turkish communities.
                     </p>
-                    <p>Through this blog, I share my thoughts on design, development, and the intersection of technology and creativity. I also document my learning journey and occasional tutorials to help others in the field.</p>
                   </div>
                 </div>
               </div>
@@ -200,7 +189,7 @@ export default function AboutPage() {
               {/* CTA Section */}
               <div className="bg-accent/10 p-6 rounded-lg border border-accent/20">
                 <h2 className="font-prosto text-xl text-secondary mb-4">Let&apos;s Connect</h2>
-                <p className="text-sm text-secondary/80 font-geologica mb-6">Have a project in mind or just want to say hello? I&apos;d love to hear from you!</p>
+                <p className="text-sm text-secondary/80 font-geologica mb-6">Interested in community service collaborations or want to learn more about my work? I&apos;d love to hear from you!</p>
                 <Link href="/contact" className="block w-full px-4 py-2 bg-accent text-white rounded-md hover:bg-accent/90 transition-colors text-center">
                   Get in Touch
                 </Link>

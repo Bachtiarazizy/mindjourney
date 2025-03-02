@@ -49,25 +49,27 @@ function BlogCard({ post, isFeatured = false }: BlogCardProps) {
             <img
               src={urlForImage(post.mainImage)
                 .width(isFeatured ? 800 : 400)
+                .height(isFeatured ? 400 : 200)
+                .fit("crop")
                 .url()}
               alt={post.mainImage.alt || post.title}
-              className={`w-full object-cover ${isFeatured ? "h-[400px]" : "h-[200px]"}`}
+              className={`w-full object-cover ${isFeatured ? "h-[250px] sm:h-[300px] md:h-[350px] lg:h-[400px]" : "h-[150px] sm:h-[180px] md:h-[200px]"}`}
             />
           )}
-          {post.category && <span className="absolute top-4 left-4 bg-background px-4 py-1 rounded-full text-secondary font-geologica text-sm">{post.category.title}</span>}
+          {post.category && <span className="absolute top-2 sm:top-4 left-2 sm:left-4 bg-background px-2 sm:px-4 py-1 rounded-full text-secondary font-geologica text-xs sm:text-sm">{post.category.title}</span>}
         </div>
 
-        <div className="p-6 flex flex-col flex-grow">
-          <div className="flex gap-4 text-sm text-secondary/70 font-geologica mb-3">
+        <div className="p-3 sm:p-4 md:p-6 flex flex-col flex-grow">
+          <div className="flex gap-2 sm:gap-4 text-xs sm:text-sm text-secondary/70 font-geologica mb-2 sm:mb-3">
             <span>{formattedDate}</span>
             <span>{post.readTime} min read</span>
           </div>
 
-          <h2 className={`font-prosto text-secondary ${isFeatured ? "text-3xl" : "text-xl"} mb-3`}>{post.title}</h2>
+          <h2 className={`font-prosto text-secondary ${isFeatured ? "text-xl sm:text-2xl md:text-3xl" : "text-lg sm:text-xl"} mb-2 sm:mb-3 line-clamp-2`}>{post.title}</h2>
 
-          <p className="paragraph-1 text-secondary/80 mb-4 flex-grow">{post.excerpt}</p>
+          <p className="paragraph-1 text-secondary/80 text-sm sm:text-base mb-3 sm:mb-4 flex-grow line-clamp-3">{post.excerpt}</p>
 
-          <span className="font-geologica text-secondary hover:text-secondary/70 transition-colors mt-auto">Read More →</span>
+          <span className="font-geologica text-sm sm:text-base text-secondary hover:text-secondary/70 transition-colors mt-auto">Read More →</span>
         </div>
       </Link>
     </article>
@@ -75,7 +77,7 @@ function BlogCard({ post, isFeatured = false }: BlogCardProps) {
 }
 
 // Blog Section query with simpler options and limited fields
-const BLOG_POSTS_QUERY = `*[_type == "post" && defined(slug.current) && !(_id in path('drafts.**'))]|order(publishedAt desc)[0...3]{
+const BLOG_POSTS_QUERY = `*[_type == "post" && defined(slug.current) && !(_id in path('drafts.**'))]|order(publishedAt desc)[0...6]{
   _id,
   title,
   slug,
@@ -95,7 +97,6 @@ const BLOG_POSTS_QUERY = `*[_type == "post" && defined(slug.current) && !(_id in
 
 // Main Blog Section Component
 export default async function BlogSection() {
-  // Choose ONE caching strategy, not both
   const posts = await client.fetch<Post[]>(
     BLOG_POSTS_QUERY,
     {},
@@ -107,8 +108,8 @@ export default async function BlogSection() {
   // If no posts found
   if (!posts || posts.length === 0) {
     return (
-      <section className="container mx-auto px-4 py-16 text-center">
-        <h1 className="heading-1 mb-4">Latest Thoughts</h1>
+      <section className="container mx-auto px-4 py-8 sm:py-12 md:py-16 text-center">
+        <h1 className="heading-1 text-2xl sm:text-3xl md:text-4xl mb-4">Latest Thoughts</h1>
         <p className="paragraph-1">No blog posts found. Check back soon!</p>
       </section>
     );
@@ -116,24 +117,27 @@ export default async function BlogSection() {
 
   // Split posts into featured and recent
   const featuredPost = posts[0];
-  const recentPosts = posts.slice(1);
+  const recentPosts = posts.slice(1, 5); // Show up to 4 recent posts
 
   return (
-    <section className="container mx-auto px-4 py-16">
-      <div className="text-center mb-12">
-        <h1 className="heading-1 mb-4">Latest Thoughts</h1>
-        <p className="paragraph-1 max-w-2xl mx-auto">Exploring ideas, sharing experiences, and documenting the journey of personal and creative growth.</p>
+    <section className="container mx-auto px-4 py-8 sm:py-12 md:py-16">
+      <div className="text-center mb-6 sm:mb-8 md:mb-12">
+        <h1 className="heading-1 text-2xl sm:text-3xl md:text-4xl mb-2 sm:mb-4">Latest Thoughts</h1>
+        <p className="paragraph-1 text-sm sm:text-base max-w-2xl mx-auto">Exploring ideas, sharing experiences, and documenting the journey of personal and creative growth.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 md:gap-8">
         {featuredPost && (
-          <div className="md:col-span-2">
+          <div className="col-span-1">
             <BlogCard post={featuredPost} isFeatured={true} />
           </div>
         )}
-        {recentPosts.map((post) => (
-          <BlogCard key={post._id} post={post} />
-        ))}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+          {recentPosts.map((post) => (
+            <BlogCard key={post._id} post={post} />
+          ))}
+        </div>
       </div>
     </section>
   );

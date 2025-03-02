@@ -5,8 +5,8 @@ import Link from "next/link";
 // Function to generate metadata for the page
 export async function generateMetadata() {
   return {
-    title: "Contact Me | Get in Touch",
-    description: "Connect with me for collaborations, questions, or just to say hello",
+    title: "Contact Azka | Get in Touch",
+    description: "Connect with Azka Musfirah for community service collaborations, media inquiries, or just to say hello",
   };
 }
 
@@ -35,32 +35,34 @@ export default function ContactPage() {
   // Static data for social links
   const socialLinks = [
     { id: 1, name: "Twitter", url: "https://twitter.com", icon: "🐦" },
-    { id: 2, name: "GitHub", url: "https://github.com", icon: "👨‍💻" },
-    { id: 3, name: "LinkedIn", url: "https://linkedin.com", icon: "💼" },
-    { id: 4, name: "Instagram", url: "https://instagram.com", icon: "📷" },
+    { id: 2, name: "LinkedIn", url: "https://linkedin.com", icon: "💼" },
+    { id: 3, name: "Instagram", url: "https://instagram.com", icon: "📷" },
+    { id: 4, name: "Radio PPI Turki", url: "https://radioppiturki.com", icon: "🎙️" },
   ];
 
   // Static data for FAQs
   const faqs = [
     {
       id: 1,
-      question: "What services do you offer?",
-      answer: "I offer web design and development services, focusing on creating responsive, user-friendly websites and applications. I specialize in front-end development using React, Next.js, and modern CSS techniques.",
+      question: "What community services do you lead?",
+      answer:
+        "I lead the 'Mentari in Turkey' program at PPI Turki, focusing on community involvement and social impact through strategic volunteer management. We plan and implement various activities that benefit both Indonesian students and the local Turkish community.",
     },
     {
       id: 2,
-      question: "Are you available for freelance work?",
-      answer: "Yes, I'm open to freelance opportunities that align with my skills and interests. I prefer projects that involve creative problem-solving and offer room for innovation.",
+      question: "Are you available for community service collaborations?",
+      answer:
+        "Yes, I'm open to collaboration opportunities that align with our community service goals and social impact initiatives. I particularly welcome projects that foster cultural exchange between Indonesian and Turkish communities.",
     },
     {
       id: 3,
-      question: "How quickly do you respond to inquiries?",
-      answer: "I typically respond to all messages within 1-2 business days. For urgent matters, please indicate so in your message subject line.",
+      question: "How can I get involved with Radio PPI Turki?",
+      answer: "Radio PPI Turki welcomes contributions from Indonesians in Turkey who are interested in media and content creation. Please mention your specific interests and skills when you reach out through the contact form.",
     },
     {
       id: 4,
-      question: "Do you offer mentoring or tutoring?",
-      answer: "I occasionally take on mentoring relationships with aspiring developers. If you're interested, please mention your goals and current skill level when you reach out.",
+      question: "Do you offer mentoring for community service initiatives?",
+      answer: "I occasionally provide guidance for individuals interested in community service and volunteer management. If you're developing a community program and would like advice, please outline your project when you contact me.",
     },
   ];
 
@@ -70,7 +72,7 @@ export default function ContactPage() {
         {/* Page Header */}
         <header className="mb-16 text-center">
           <h1 className="font-prosto text-4xl md:text-5xl text-secondary font-normal mb-6">Contact Me</h1>
-          <p className="font-geologica text-secondary/80 max-w-2xl mx-auto">Have a question, project idea, or just want to say hello? I&apos;d love to hear from you!</p>
+          <p className="font-geologica text-secondary/80 max-w-2xl mx-auto">Have a question, collaboration idea, or just want to say hello? I&apos;d love to hear from you!</p>
         </header>
 
         <div className="flex flex-col lg:flex-row gap-12">
@@ -114,7 +116,7 @@ export default function ContactPage() {
                     type="text"
                     id="subject"
                     className="w-full px-4 py-2 bg-secondary/5 border border-secondary/20 rounded-md text-secondary placeholder:text-secondary/40 focus:outline-none focus:ring-1 focus:ring-accent"
-                    placeholder="Project Inquiry"
+                    placeholder="Collaboration Inquiry"
                   />
                 </div>
 
@@ -126,7 +128,7 @@ export default function ContactPage() {
                     id="message"
                     rows={6}
                     className="w-full px-4 py-2 bg-secondary/5 border border-secondary/20 rounded-md text-secondary placeholder:text-secondary/40 focus:outline-none focus:ring-1 focus:ring-accent resize-none"
-                    placeholder="Tell me about your project, question, or just say hello..."
+                    placeholder="Tell me about your collaboration idea, question, or just say hello..."
                   ></textarea>
                 </div>
 
@@ -155,14 +157,14 @@ export default function ContactPage() {
             <div className="sticky top-20 space-y-8">
               {/* Profile Card */}
               <div className="bg-primary/95 backdrop-blur-sm p-6 rounded-lg border border-secondary/10 text-center">
-                <img src="/api/placeholder/300/300" alt="Profile picture" className="w-32 h-32 rounded-full object-cover border-2 border-accent/20 mx-auto mb-4" />
-                <h2 className="font-prosto text-xl text-secondary mb-2">Alex Morgan</h2>
-                <p className="text-accent/80 font-geologica text-sm mb-4">Front-end Developer & Designer</p>
-                <p className="text-secondary/80 font-geologica text-sm mb-6">Based in Seattle, WA. Available for freelance projects and collaborations.</p>
+                <img src="/azka.jpg" alt="Profile picture" className="w-32 h-32 rounded-full object-cover border-2 border-accent/20 mx-auto mb-4" />
+                <h2 className="font-prosto text-xl text-secondary mb-2">Azka Musfirah</h2>
+                <p className="text-accent/80 font-geologica text-sm mb-4">Community Service Leader & Media Manager</p>
+                <p className="text-secondary/80 font-geologica text-sm mb-6">Based in Turkey. Available for community service collaborations and media initiatives.</p>
                 <div className="pt-4 border-t border-secondary/10">
                   <p className="text-sm text-secondary font-geologica mb-2">Email me directly:</p>
-                  <Link href="mailto:hello@example.com" className="text-accent hover:underline font-geologica text-sm">
-                    hello@example.com
+                  <Link href="mailto:azka@ppiturki.org" className="text-accent hover:underline font-geologica text-sm">
+                    azka@ppiturki.org
                   </Link>
                 </div>
               </div>
@@ -177,10 +179,10 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              {/* Newsletter Section */}
+              {/* Program Updates Section */}
               <div className="bg-primary/95 backdrop-blur-sm p-6 rounded-lg border border-secondary/10">
-                <h2 className="font-prosto text-xl text-secondary mb-4">Join My Newsletter</h2>
-                <p className="text-sm text-secondary/80 font-geologica mb-6">Subscribe to receive updates on new blog posts, projects, and occasional tips & tricks.</p>
+                <h2 className="font-prosto text-xl text-secondary mb-4">Stay Updated</h2>
+                <p className="text-sm text-secondary/80 font-geologica mb-6">Subscribe to receive updates on community service programs, Radio PPI Turki broadcasts, and volunteer opportunities.</p>
                 <form className="space-y-4">
                   <div>
                     <input
