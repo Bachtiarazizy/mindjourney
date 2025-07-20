@@ -1,11 +1,15 @@
+import BlogSection from "@/components/blog-section";
 import Hero from "@/components/hero";
-import BlogSection from "@/components/blog-post";
+import React from "react";
 
-export default async function IndexPage() {
+const BlogLanding = async () => {
   return (
-    <>
+    <div className="min-h-screen bg-gray-50">
       <Hero />
       <BlogSection />
-    </>
+      {/* Featured Blog Section */}
+    </div>
   );
-}
+};
+
+export default BlogLanding;

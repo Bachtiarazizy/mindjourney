@@ -11,7 +11,7 @@
 
 @layer base {
   body {
-    @apply text-secondary bg-primary font-geologica;
+    @apply text-secondary bg-primary font-poppins;
   }
 
   h1,
@@ -20,17 +20,17 @@
   h4,
   h5,
   h6 {
-    @apply font-prosto;
+    @apply font-playfair;
   }
 }
 
 @layer components {
   .paragraph-1 {
-    @apply text-[#222222] font-geologica text-base leading-6;
+    @apply text-[#222222] font-poppins text-base leading-6;
   }
 
   .heading-1 {
-    @apply text-[#222222] font-prosto text-[72px] leading-[82px] uppercase;
+    @apply text-[#222222] font-playfair text-[72px] leading-[82px] uppercase font-bold;
   }
 
   .button-1 {
@@ -49,11 +49,11 @@
     text-wrap: balance;
   }
 
-  .font-prosto {
-    font-family: var(--font-prosto-one), system-ui, sans-serif;
+  .font-playfair {
+    font-family: var(--font-playfair-display), serif;
   }
 
-  .font-geologica {
-    font-family: var(--font-geologica), system-ui, sans-serif;
+  .font-poppins {
+    font-family: var(--font-poppins), sans-serif;
   }
 }
