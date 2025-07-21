@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 
 interface NavbarData {
   title: string;
@@ -27,11 +28,13 @@ export function NavbarClient({ data }: NavbarClientProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo Section */}
-          <Image src="/Mindjourney.png" alt="" width={200} height={200} />
+          <Link href="/" className="flex items-center space-x-3">
+            <Image src="/Mindjourney.png" alt="" width={200} height={200} />
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
-            <a href="/node_modules" className="text-gray-900 hover:text-[#4460a6] transition-colors font-medium">
+            <a href="/" className="text-gray-900 hover:text-[#4460a6] transition-colors font-medium">
               Home
             </a>
 
