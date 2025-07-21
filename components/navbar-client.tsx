@@ -27,32 +27,22 @@ export function NavbarClient({ data }: NavbarClientProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo Section */}
-          <div className="flex items-center space-x-3">
-            {data.logoUrl ? (
-              <div className="w-10 h-10 relative overflow-hidden rounded-full">
-                <Image src={data.logoUrl} alt={data.title} fill className="object-cover" sizes="40px" />
-              </div>
-            ) : (
-              <div className="w-10 h-10 bg-pink-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">{data.title.charAt(0).toUpperCase()}</span>
-              </div>
-            )}
-            <span className="text-gray-900 font-medium text-lg">{data.title}</span>
-          </div>
+          <Image src="/Mindjourney.png" alt="" width={200} height={200} />
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
-            <a href="#" className="text-gray-900 hover:text-pink-500 transition-colors font-medium">
+            <a href="/node_modules" className="text-gray-900 hover:text-[#4460a6] transition-colors font-medium">
               Home
             </a>
-            <a href="#subscribe" className="text-gray-600 hover:text-pink-500 transition-colors font-medium">
-              Subscribe
+
+            <a href="/blog" className="text-gray-600 hover:text-[#4460a6] transition-colors font-medium">
+              Blog
             </a>
-            <a href="#about" className="text-gray-600 hover:text-pink-500 transition-colors font-medium">
+            <a href="/about" className="text-gray-600 hover:text-[#4460a6] transition-colors font-medium">
               About
             </a>
             {data.email && (
-              <a href={`mailto:${data.email}`} className="text-gray-600 hover:text-pink-500 transition-colors font-medium">
+              <a href={`mailto:${data.email}`} className="text-gray-600 hover:text-[#4460a6] transition-colors font-medium">
                 Contact
               </a>
             )}
@@ -60,17 +50,16 @@ export function NavbarClient({ data }: NavbarClientProps) {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <button className="p-2 text-gray-600 hover:text-pink-500 transition-colors" aria-label="Search">
+            <button className="p-2 text-gray-600 hover:text-[#4460a6] transition-colors" aria-label="Search">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </button>
-            <button className="bg-pink-500 text-white px-6 py-2 rounded-lg hover:bg-pink-600 transition-colors font-medium">Sign in</button>
           </div>
 
           {/* Mobile Menu Button */}
           <div className="md:hidden">
-            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 text-gray-600 hover:text-pink-500 transition-colors" aria-label="Toggle mobile menu">
+            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 text-gray-600 hover:text-[#4460a6] transition-colors" aria-label="Toggle mobile menu">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {mobileMenuOpen ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /> : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />}
               </svg>
@@ -82,27 +71,26 @@ export function NavbarClient({ data }: NavbarClientProps) {
         {mobileMenuOpen && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="md:hidden border-t border-gray-200 py-4">
             <div className="flex flex-col space-y-4">
-              <a href="#" className="text-gray-900 hover:text-pink-500 transition-colors font-medium px-2" onClick={() => setMobileMenuOpen(false)}>
+              <a href="/" className="text-gray-900 hover:text-[#4460a6] transition-colors font-medium px-2" onClick={() => setMobileMenuOpen(false)}>
                 Home
               </a>
-              <a href="#subscribe" className="text-gray-600 hover:text-pink-500 transition-colors font-medium px-2" onClick={() => setMobileMenuOpen(false)}>
-                Subscribe
+              <a href="/blog" className="text-gray-600 hover:text-[#4460a6] transition-colors font-medium px-2" onClick={() => setMobileMenuOpen(false)}>
+                My Blog
               </a>
-              <a href="#about" className="text-gray-600 hover:text-pink-500 transition-colors font-medium px-2" onClick={() => setMobileMenuOpen(false)}>
+              <a href="/about" className="text-gray-600 hover:text-[#4460a6] transition-colors font-medium px-2" onClick={() => setMobileMenuOpen(false)}>
                 About
               </a>
               {data.email && (
-                <a href={`mailto:${data.email}`} className="text-gray-600 hover:text-pink-500 transition-colors font-medium px-2" onClick={() => setMobileMenuOpen(false)}>
+                <a href={`mailto:${data.email}`} className="text-gray-600 hover:text-[#4460a6] transition-colors font-medium px-2" onClick={() => setMobileMenuOpen(false)}>
                   Contact
                 </a>
               )}
               <div className="flex items-center justify-between px-2 pt-4 border-t border-gray-200">
-                <button className="p-2 text-gray-600 hover:text-pink-500 transition-colors" aria-label="Search">
+                <button className="p-2 text-gray-600 hover:text-[#4460a6] transition-colors" aria-label="Search">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </button>
-                <button className="bg-pink-500 text-white px-6 py-2 rounded-lg hover:bg-pink-600 transition-colors font-medium">Sign in</button>
               </div>
             </div>
           </motion.div>
@@ -118,7 +106,7 @@ export function NavbarClient({ data }: NavbarClientProps) {
                 href={data.socialMedia.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 bg-white shadow-md rounded-full text-gray-600 hover:text-pink-500 hover:shadow-lg transition-all"
+                className="p-2 bg-white shadow-md rounded-full text-gray-600 hover:text-[#4460a6] hover:shadow-lg transition-all"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -132,7 +120,7 @@ export function NavbarClient({ data }: NavbarClientProps) {
                 href={data.socialMedia.twitter}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 bg-white shadow-md rounded-full text-gray-600 hover:text-pink-500 hover:shadow-lg transition-all"
+                className="p-2 bg-white shadow-md rounded-full text-gray-600 hover:text-[#4460a6] hover:shadow-lg transition-all"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -146,7 +134,7 @@ export function NavbarClient({ data }: NavbarClientProps) {
                 href={data.socialMedia.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 bg-white shadow-md rounded-full text-gray-600 hover:text-pink-500 hover:shadow-lg transition-all"
+                className="p-2 bg-white shadow-md rounded-full text-gray-600 hover:text-[#4460a6] hover:shadow-lg transition-all"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -160,7 +148,7 @@ export function NavbarClient({ data }: NavbarClientProps) {
                 href={data.socialMedia.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 bg-white shadow-md rounded-full text-gray-600 hover:text-pink-500 hover:shadow-lg transition-all"
+                className="p-2 bg-white shadow-md rounded-full text-gray-600 hover:text-[#4460a6] hover:shadow-lg transition-all"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
               >

@@ -20,7 +20,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "MindJourney Blog",
+  title: "Mindjourneyme | A journal of Growing through it",
   description: "Explore the latest articles on business, beauty, technology, and more. Stay updated with insights and trends.",
 };
 

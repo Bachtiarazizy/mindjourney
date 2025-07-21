@@ -33,8 +33,8 @@ export function HeroClient({ data }: HeroClientProps) {
           </motion.div>
 
           <motion.div className="space-y-8" initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
-            <div className="flex items-center space-x-2 text-orange-500">
-              <span className="bg-pink-500 text-white px-2 py-1 text-xs rounded">NEW</span>
+            <div className="flex items-center space-x-2 text-[#4460a6]">
+              <span className="bg-[#36539b] text-white px-2 py-1 text-xs rounded">NEW</span>
               <span className="text-sm">{data.subheadline}</span>
             </div>
 

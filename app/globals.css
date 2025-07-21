@@ -2,13 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --primary: #ffffff;
-  --secondary: #222222;
-  --background: #ffe2eb;
-  --foreground: #f4f4f4;
-}
-
 @layer base {
   body {
     @apply text-secondary bg-primary font-poppins;

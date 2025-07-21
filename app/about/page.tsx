@@ -1,203 +1,276 @@
-/* eslint-disable @next/next/no-img-element */
-import React from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// app/about/page.tsx
+import { PortableText, type SanityDocument } from "next-sanity";
+import { client, urlForImage } from "@/sanity/client";
+import { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
+import { Instagram, Twitter, Linkedin, Globe, Mail, Heart, Coffee, Sparkles, ArrowRight } from "lucide-react";
 
-// Function to generate metadata for the page
-export async function generateMetadata() {
-  return {
-    title: "About Me | Azka Musfirah",
-    description: "Learn more about Azka Musfirah, her community service experience, and psychology background",
-  };
-}
+// Query untuk mengambil author utama (bisa berdasarkan featured atau yang pertama)
+const AUTHOR_QUERY = `*[_type == "author"] | order(featured desc, _createdAt asc)[0] {
+  name,
+  slug,
+  image,
+  bio,
+  jobTitle,
+  shortBio,
+  social,
+  featured,
+  "postCount": count(*[_type == "post" && references(^._id)])
+}`;
 
-// Skill Component
-function Skill({ name, level }: { name: string; level: number }) {
-  return (
-    <div className="mb-4">
-      <div className="flex justify-between mb-1">
-        <span className="text-sm font-geologica text-secondary">{name}</span>
-        <span className="text-xs font-geologica text-secondary/70">{level}%</span>
-      </div>
-      <div className="h-2 bg-secondary/10 rounded-full">
-        <div className="h-full bg-accent rounded-full" style={{ width: `${level}%` }}></div>
-      </div>
-    </div>
-  );
-}
+// Query untuk stats
+const STATS_QUERY = `{
+  "totalPosts": count(*[_type == "post"]),
+  "totalCategories": count(*[_type == "category"]),
+  "latestPost": *[_type == "post"] | order(publishedAt desc)[0] {
+    title,
+    publishedAt
+  }
+}`;
 
-// Experience Item Component
-function ExperienceItem({ period, role, company, description }: { period: string; role: string; company: string; description: string }) {
-  return (
-    <div className="relative pl-8 pb-8 border-l border-secondary/20 last:border-0 last:pb-0">
-      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-accent -translate-x-2"></div>
-      <div className="mb-2">
-        <span className="text-xs font-bold bg-accent/10 text-accent px-2 py-1 rounded-full">{period}</span>
-      </div>
-      <h3 className="font-prosto text-lg text-secondary mb-1">{role}</h3>
-      <p className="text-accent/80 font-geologica text-sm mb-2">{company}</p>
-      <p className="text-secondary/80 font-geologica text-sm">{description}</p>
-    </div>
-  );
-}
+const options = { next: { revalidate: 30 } };
 
-// Interest Card Component
-function InterestCard({ icon, title }: { icon: string; title: string }) {
-  return (
-    <div className="flex items-center gap-3 p-3 border border-secondary/10 rounded-lg hover:bg-secondary/5 transition-colors">
-      <div className="text-xl text-accent">{icon}</div>
-      <h3 className="font-geologica text-sm text-secondary">{title}</h3>
-    </div>
-  );
-}
+export const metadata: Metadata = {
+  title: "About Me | Personal Blog",
+  description: "Learn more about my journey, passion for beauty and lifestyle, and the story behind this blog.",
+  openGraph: {
+    title: "About Me | Personal Blog",
+    description: "Learn more about my journey, passion for beauty and lifestyle, and the story behind this blog.",
+    type: "website",
+  },
+};
 
-// Main about page component
-export default function AboutPage() {
-  // Static data for skills
-  const skills = [
-    { id: 1, name: "Volunteer Management", level: 90 },
-    { id: 2, name: "Community Engagement", level: 85 },
-    { id: 3, name: "Media Management", level: 80 },
-    { id: 4, name: "Psychology", level: 85 },
-    { id: 5, name: "Creative Content", level: 75 },
-  ];
+export default async function AboutPage() {
+  const [author, stats] = await Promise.all([client.fetch<SanityDocument>(AUTHOR_QUERY, {}, options), client.fetch<any>(STATS_QUERY, {}, options)]);
 
-  // Static data for experience
-  const experiences = [
-    {
-      id: 1,
-      period: "Current",
-      role: "Social and Community Service Department",
-      company: "PPI Turki",
-      description:
-        "Leading the 'Mentari in Turkey' program focused on fostering community involvement and social impact through strategic volunteer management. Planning and implementing community service activities that address the needs of both Indonesian students and the local Turkish community.",
-    },
-    {
-      id: 2,
-      period: "Current",
-      role: "Media and Creative Manager",
-      company: "Radio PPI Turki",
-      description:
-        "Enhancing Radio PPI Turki's presence amongst Indonesians in Turkey through creative media strategies and compelling content. Developing innovative approaches to engage the Indonesian community in Turkey through various media channels.",
-    },
-  ];
-
-  // Static data for education
-  const education = [
-    {
-      id: 1,
-      period: "Current",
-      role: "Psychology and Guidance Counselling",
-      company: "Sivas Cumhuriyet Üniversitesi",
-      description:
-        "Studying psychology with a focus on guidance counselling, developing expertise in understanding human behavior and providing support to individuals. Applying psychological principles to enhance community service approaches.",
-    },
-  ];
-
-  // Static data for interests
-  const interests = [
-    { id: 1, icon: "👥", title: "Community Service" },
-    { id: 2, icon: "🧠", title: "Psychology" },
-    { id: 3, icon: "🎙️", title: "Media" },
-    { id: 4, icon: "✈️", title: "Cultural Exchange" },
-    { id: 5, icon: "🤝", title: "Volunteer Work" },
-    { id: 6, icon: "📝", title: "Content Creation" },
-  ];
-
-  return (
-    <main className="bg-primary min-h-screen">
-      <div className="container mx-auto px-4 py-20 max-w-6xl">
-        {/* Page Header */}
-        <header className="mb-16 text-center">
-          <h1 className="font-prosto text-4xl md:text-5xl text-secondary font-normal mb-6">About Me</h1>
-          <p className="font-geologica text-secondary/80 max-w-2xl mx-auto">Community service leader, media manager, and psychology student dedicated to social impact</p>
-        </header>
-
-        <div className="flex flex-col lg:flex-row gap-12">
-          {/* Main content - Left side */}
-          <div className="lg:w-2/3">
-            {/* Profile Section */}
-            <section className="mb-16">
-              <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
-                <div className="shrink-0">
-                  <img src="/azka.jpg" alt="Profile picture" className="w-48 h-48 rounded-full object-cover border-4 border-accent/20" />
-                </div>
-                <div>
-                  <h2 className="font-prosto text-2xl text-secondary mb-4 text-center md:text-left">Hello, I&apos;m Azka Musfirah</h2>
-                  <div className="space-y-4 font-geologica text-secondary/80">
-                    <p>
-                      I&apos;m passionate about community service and social impact with a focus on volunteer management. Currently based in Turkey, I lead the &quot;Mentari in Turkey&quot; program at PPI Turki while studying Psychology and
-                      Guidance Counselling at Sivas Cumhuriyet Üniversitesi.
-                    </p>
-                    <p>
-                      My work involves planning and implementing community service activities that address the needs of both Indonesian students and the local Turkish community. I partner with a vibrant team to innovate and amplify our
-                      outreach and effectiveness.
-                    </p>
-                    <p>Additionally, as the Media and Creative Manager at Radio PPI Turki, I work on enhancing our presence amongst Indonesians in Turkey through creative media strategies and compelling content development.</p>
-                    <p>
-                      My academic pursuit in Psychology continuously informs my approach to community service, ensuring compassionate and culturally sensitive engagement in all my initiatives. I believe in creating meaningful connections
-                      and supporting both the Indonesian and Turkish communities.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Experience Section */}
-            <section className="mb-16">
-              <h2 className="font-prosto text-2xl text-secondary mb-6 pb-3 border-b border-secondary/10">Professional Experience</h2>
-              <div className="ml-4">
-                {experiences.map((item) => (
-                  <ExperienceItem key={item.id} period={item.period} role={item.role} company={item.company} description={item.description} />
-                ))}
-              </div>
-            </section>
-
-            {/* Education Section */}
-            <section className="mb-16">
-              <h2 className="font-prosto text-2xl text-secondary mb-6 pb-3 border-b border-secondary/10">Education</h2>
-              <div className="ml-4">
-                {education.map((item) => (
-                  <ExperienceItem key={item.id} period={item.period} role={item.role} company={item.company} description={item.description} />
-                ))}
-              </div>
-            </section>
-          </div>
-
-          {/* Sidebar - Right side */}
-          <aside className="lg:w-1/3">
-            <div className="sticky top-20 space-y-8">
-              {/* Skills Section */}
-              <div className="bg-primary/95 backdrop-blur-sm p-6 rounded-lg border border-secondary/10">
-                <h2 className="font-prosto text-xl text-secondary mb-6 pb-3 border-b border-secondary/10">Skills</h2>
-                <div className="space-y-2">
-                  {skills.map((skill) => (
-                    <Skill key={skill.id} name={skill.name} level={skill.level} />
-                  ))}
-                </div>
-              </div>
-
-              {/* Interests Section */}
-              <div className="bg-primary/95 backdrop-blur-sm p-6 rounded-lg border border-secondary/10">
-                <h2 className="font-prosto text-xl text-secondary mb-6 pb-3 border-b border-secondary/10">Interests</h2>
-                <div className="grid grid-cols-2 gap-3">
-                  {interests.map((interest) => (
-                    <InterestCard key={interest.id} icon={interest.icon} title={interest.title} />
-                  ))}
-                </div>
-              </div>
-
-              {/* CTA Section */}
-              <div className="bg-accent/10 p-6 rounded-lg border border-accent/20">
-                <h2 className="font-prosto text-xl text-secondary mb-4">Let&apos;s Connect</h2>
-                <p className="text-sm text-secondary/80 font-geologica mb-6">Interested in community service collaborations or want to learn more about my work? I&apos;d love to hear from you!</p>
-                <Link href="/contact" className="block w-full px-4 py-2 bg-accent text-white rounded-md hover:bg-accent/90 transition-colors text-center">
-                  Get in Touch
-                </Link>
-              </div>
-            </div>
-          </aside>
+  if (!author) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold mb-4">Author Information Not Found</h1>
+          <Link href="/" className="text-pink-600 hover:underline">
+            Back to Home
+          </Link>
         </div>
       </div>
-    </main>
+    );
+  }
+
+  const authorImageUrl = author.image ? urlForImage(author.image)?.url() : null;
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section */}
+      <div className="bg-gradient-to-br from-pink-500 to-purple-600 text-white py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Text Content */}
+            <div>
+              <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">Hi, I&apos;m {author.name}</h1>
+              {author.jobTitle && <p className="text-2xl text-white/90 mb-6 font-medium">{author.jobTitle}</p>}
+              <p className="text-xl opacity-90 mb-8 leading-relaxed">{author.shortBio || "Welcome to my personal space where I share my passion for beauty, lifestyle, and everything that inspires me."}</p>
+
+              {/* Social Links */}
+              {author.social && (
+                <div className="flex items-center gap-4 mb-8">
+                  {author.social.instagram && (
+                    <a href={author.social.instagram} className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:bg-white/30 transition-colors" target="_blank" rel="noopener noreferrer">
+                      <Instagram className="w-6 h-6" />
+                    </a>
+                  )}
+                  {author.social.twitter && (
+                    <a href={author.social.twitter} className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:bg-white/30 transition-colors" target="_blank" rel="noopener noreferrer">
+                      <Twitter className="w-6 h-6" />
+                    </a>
+                  )}
+                  {author.social.linkedin && (
+                    <a href={author.social.linkedin} className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:bg-white/30 transition-colors" target="_blank" rel="noopener noreferrer">
+                      <Linkedin className="w-6 h-6" />
+                    </a>
+                  )}
+                  {author.social.website && (
+                    <a href={author.social.website} className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:bg-white/30 transition-colors" target="_blank" rel="noopener noreferrer">
+                      <Globe className="w-6 h-6" />
+                    </a>
+                  )}
+                </div>
+              )}
+
+              {/* Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold mb-1">{stats.totalPosts}+</div>
+                  <div className="text-sm text-white/80">Articles</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold mb-1">{stats.totalCategories}+</div>
+                  <div className="text-sm text-white/80">Topics</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center col-span-2 md:col-span-1">
+                  <div className="text-2xl font-bold mb-1">2024</div>
+                  <div className="text-sm text-white/80">Since</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Profile Image */}
+            <div className="flex justify-center lg:justify-end">
+              <div className="relative">
+                {authorImageUrl ? (
+                  <Image src={authorImageUrl} alt={author.name} width={400} height={400} className="rounded-2xl shadow-2xl w-80 h-80 md:w-96 md:h-96 object-cover" priority />
+                ) : (
+                  <div className="rounded-2xl shadow-2xl w-80 h-80 md:w-96 md:h-96 bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <div className="text-white/60 text-6xl">👋</div>
+                  </div>
+                )}
+                <div className="absolute -top-4 -right-4 bg-yellow-400 text-yellow-900 p-3 rounded-full animate-pulse">
+                  <Sparkles className="w-6 h-6 fill-current" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* About Content */}
+      <div className="py-24 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            {/* Main Bio Content */}
+            <div className="lg:col-span-2">
+              <h2 className="text-4xl font-bold mb-8 text-gray-900">My Story</h2>
+
+              {author.bio && Array.isArray(author.bio) ? (
+                <div
+                  className="prose prose-xl max-w-none 
+                  prose-headings:font-bold prose-headings:tracking-tight
+                  prose-h2:text-3xl prose-h2:mb-6 prose-h2:mt-8
+                  prose-h3:text-2xl prose-h3:mb-4 prose-h3:mt-6
+                  prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-6
+                  prose-strong:text-gray-900 prose-strong:font-semibold
+                  prose-a:text-pink-600 prose-a:font-medium prose-a:no-underline hover:prose-a:underline
+                  prose-blockquote:border-l-4 prose-blockquote:border-pink-500 prose-blockquote:bg-pink-50 
+                  prose-blockquote:px-6 prose-blockquote:py-4 prose-blockquote:rounded-r-lg
+                  prose-ul:my-6 prose-ol:my-6 prose-li:mb-2
+                "
+                >
+                  <PortableText value={author.bio} />
+                </div>
+              ) : (
+                <div className="prose prose-xl max-w-none text-gray-700 leading-relaxed">
+                  <p className="mb-6">
+                    Welcome to my corner of the internet! I&apos;m passionate about sharing my journey through the world of beauty, lifestyle, and personal growth. What started as a personal hobby has grown into a space where I can connect
+                    with like-minded individuals who share similar interests and curiosities.
+                  </p>
+                  <p className="mb-6">
+                    My approach is all about authenticity and real experiences. I believe in honest reviews, practical tips, and content that actually adds value to your daily routine. Whether it&apos;s the latest skincare trend or timeless
+                    beauty wisdom, I&apos;m here to share what works and what doesn&apos;t.
+                  </p>
+                  <p>
+                    When I&apos;m not writing or testing new products, you can find me exploring new places, trying different cuisines, or simply enjoying a good book with a cup of coffee. Life is about balance, and I love sharing all
+                    aspects of it with you.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Sidebar */}
+            <div className="lg:col-span-1">
+              <div className="sticky top-8 space-y-6">
+                {/* Quick Facts */}
+                <div className="bg-pink-50 rounded-2xl p-6">
+                  <h3 className="text-xl font-bold mb-4 flex items-center text-pink-900">
+                    <Heart className="w-5 h-5 mr-2" />
+                    Quick Facts
+                  </h3>
+                  <div className="space-y-3 text-gray-700">
+                    <div className="flex items-center">
+                      <Coffee className="w-4 h-4 mr-3 text-pink-600" />
+                      <span>Coffee enthusiast</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Sparkles className="w-4 h-4 mr-3 text-pink-600" />
+                      <span>Beauty experimenter</span>
+                    </div>
+                    {stats.latestPost && (
+                      <div className="pt-2 border-t border-pink-200">
+                        <p className="text-sm text-gray-600">Latest post:</p>
+                        <p className="font-medium text-pink-900">{stats.latestPost.title}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Contact Card */}
+                <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-6 text-white">
+                  <h3 className="text-xl font-bold mb-4">Let&apos;s Connect!</h3>
+                  <p className="mb-4 text-white/90 text-sm">Have a question or want to collaborate? I&apos;d love to hear from you!</p>
+                  <Link href="/contact" className="bg-white text-purple-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center text-sm">
+                    <Mail className="w-4 h-4 mr-2" />
+                    Get in Touch
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Values Section */}
+      <div className="py-24 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4 text-gray-900">What I Believe In</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">The principles that guide my content and approach to beauty and lifestyle</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow">
+              <div className="bg-pink-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Heart className="w-8 h-8 text-pink-600" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Authenticity</h3>
+              <p className="text-gray-600">Real experiences and honest opinions. No fluff, just genuine insights from my personal journey.</p>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow">
+              <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Sparkles className="w-8 h-8 text-purple-600" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Quality Content</h3>
+              <p className="text-gray-600">Every post is crafted with care, research, and attention to detail to provide real value.</p>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow md:col-span-2 lg:col-span-1">
+              <div className="bg-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Coffee className="w-8 h-8 text-yellow-600" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Community</h3>
+              <p className="text-gray-600">Building connections and learning from each other. Your feedback and stories inspire me every day.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="py-24 bg-gradient-to-br from-pink-500 to-purple-600">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-4xl font-bold text-white mb-6">Ready to Join the Journey?</h2>
+          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">Explore my latest posts, discover new favorites, and let&apos;s navigate the world of beauty and lifestyle together.</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/blog" className="bg-white text-pink-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors inline-flex items-center justify-center">
+              Read My Blog
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Link>
+            <Link href="/contact" className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-pink-600 transition-colors inline-flex items-center justify-center">
+              Say Hello
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

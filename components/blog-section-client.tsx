@@ -1,202 +1,328 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-// blog-section-client.tsx (Client Component)
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import Image from "next/image";
+import React, { useState, useRef, useEffect } from "react";
+import Link from "next/link";
+import { ChevronLeft, ChevronRight, Clock, User, ArrowRight, Crown } from "lucide-react";
 
-interface BlogPost {
-  category: string;
-  title: string;
-  description: string;
-  author: string;
-  date: string;
-  imageUrl: string | null;
+interface Author {
+  name: string;
+  jobTitle: string;
+  shortBio: string;
+  image: string | null;
   slug: string;
-  readTime: number;
 }
 
-interface BlogSectionData {
+interface BlogPost {
+  id: string;
+  category: string;
+  categoryColor: string;
+  categoryIcon: string | null;
+  title: string;
+  description: string;
+  author: Author;
+  date: string;
+  imageUrl: string | null;
+  imageAlt: string;
+  slug: string;
+  readTime: number;
+  tags: string[];
+  featured: boolean;
+  recommended: boolean;
+  favorite: boolean;
+  premium: boolean;
+}
+
+interface BlogData {
   featuredPosts: BlogPost[];
   recommendedPosts: BlogPost[];
   favoritePosts: BlogPost[];
+  allPosts: BlogPost[];
+  pagination: {
+    currentPage: number;
+    totalPosts: number;
+    postsPerPage: number;
+    totalPages: number;
+  };
 }
 
 interface BlogSectionClientProps {
-  data: BlogSectionData;
+  data: BlogData;
 }
 
-export function BlogSectionClient({ data }: BlogSectionClientProps) {
-  const fadeInUp = {
-    initial: { opacity: 0, y: 60 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.6 },
-  };
-
-  const staggerChildren = {
-    animate: {
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const BlogPostCard = ({ post, className = "", size = "large" }: { post: BlogPost; className?: string; size?: "large" | "medium" | "small" }) => (
-    <motion.article className={`group cursor-pointer ${className}`} variants={fadeInUp} whileHover={{ y: size === "large" ? -10 : -5 }} transition={{ duration: 0.3 }}>
-      <a href={`/blog/${post.slug}`} className="block">
-        <div className={`relative rounded-xl overflow-hidden mb-4 ${size === "large" ? "h-48" : size === "medium" ? "h-56" : "h-40"}`}>
-          {post.imageUrl ? (
-            <Image src={post.imageUrl} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes={size === "large" ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 100vw, 33vw"} />
-          ) : (
-            <div className="w-full h-full bg-gray-300 flex items-center justify-center">
-              <span className="text-gray-500 text-sm">No Image</span>
-            </div>
-          )}
-        </div>
-
-        <span className="text-pink-500 text-sm font-medium">{post.category}</span>
-
-        <h3 className={`font-bold text-gray-900 mt-2 mb-3 group-hover:text-pink-500 transition-colors ${size === "large" ? "text-xl" : size === "medium" ? "text-lg" : "text-base"}`}>{post.title}</h3>
-
-        <p className={`text-gray-600 mb-4 ${size === "small" ? "text-sm" : ""}`}>{post.description}</p>
-
-        <div className="flex items-center space-x-3">
-          <div className={`bg-gray-400 rounded-full flex-shrink-0 ${size === "large" ? "w-8 h-8" : "w-6 h-6"}`}></div>
-          <div>
-            <p className={`font-medium text-gray-900 ${size === "small" ? "text-sm" : ""}`}>{post.author}</p>
-            <p className={`text-gray-500 ${size === "small" ? "text-xs" : "text-sm"}`}>
-              {post.date} • {post.readTime} min read
-            </p>
-          </div>
-        </div>
-      </a>
-    </motion.article>
-  );
+const BlogCard: React.FC<{ post: BlogPost; variant?: "default" | "featured" | "compact" }> = ({ post, variant = "default" }) => {
+  const isCompact = variant === "compact";
+  const isFeatured = variant === "featured";
 
   return (
-    <>
-      {/* Featured Blog Section */}
-      {data.featuredPosts.length > 0 && (
-        <section className="py-16 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center mb-8">
-              <motion.h2 className="text-4xl font-bold text-gray-900" {...fadeInUp}>
-                Featured Blog
-              </motion.h2>
-              <div className="flex space-x-2">
-                <button className="p-2 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors">
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <button className="p-2 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors">
-                  <ChevronRight className="w-5 h-5" />
-                </button>
+    <Link href={`/blog/${post.slug}`} className="block h-full">
+      <div className={`group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer ${isFeatured ? "lg:col-span-2" : ""} ${isCompact ? "h-full" : ""}`}>
+        <div className={`relative ${isCompact ? "aspect-[4/3]" : "aspect-[3/2]"} overflow-hidden`}>
+          {post.imageUrl ? (
+            <img src={post.imageUrl} alt={post.imageAlt} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+              <div className="text-gray-400 text-4xl">📝</div>
+            </div>
+          )}
+
+          {/* Category Badge */}
+          <div className="absolute top-4 left-4">
+            <div className="px-3 py-1 rounded-full text-xs font-semibold text-white backdrop-blur-sm" style={{ backgroundColor: `${post.categoryColor}CC` }}>
+              {post.categoryIcon && <img src={post.categoryIcon} alt="" className="inline w-3 h-3 mr-1" />}
+              {post.category}
+            </div>
+          </div>
+
+          {/* Premium Badge */}
+          {post.premium && (
+            <div className="absolute top-4 left-4 mt-8">
+              <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white px-2 py-1 rounded-full text-xs flex items-center font-semibold">
+                <Crown className="w-3 h-3 mr-1" />
+                Premium
               </div>
             </div>
+          )}
 
-            <motion.div className={`grid gap-8 ${data.featuredPosts.length === 1 ? "md:grid-cols-1" : "md:grid-cols-2"}`} variants={staggerChildren} initial="initial" whileInView="animate" viewport={{ once: true }}>
-              {data.featuredPosts.map((post, index) => (
-                <BlogPostCard key={post.slug} post={post} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow p-6" size="large" />
-              ))}
-            </motion.div>
-          </div>
-        </section>
-      )}
-
-      {/* Recommended Blog Section */}
-      {data.recommendedPosts.length > 0 && (
-        <section className="py-16 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center mb-8">
-              <motion.h2 className="text-4xl font-bold text-gray-900" {...fadeInUp}>
-                Recommended Blog
-              </motion.h2>
-              <div className="flex space-x-2">
-                <button className="p-2 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors">
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <button className="p-2 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors">
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            <motion.div className="grid md:grid-cols-3 gap-6" variants={staggerChildren} initial="initial" whileInView="animate" viewport={{ once: true }}>
-              {data.recommendedPosts.map((post, index) => (
-                <BlogPostCard key={post.slug} post={post} size="medium" />
-              ))}
-            </motion.div>
-          </div>
-        </section>
-      )}
-
-      {/* Premium Content CTA */}
-      <motion.section className="py-16 bg-gradient-to-r from-pink-100 to-yellow-50" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <motion.div className="bg-gray-300 rounded-2xl h-80" whileHover={{ scale: 1.05 }} transition={{ duration: 0.3 }}></motion.div>
-
-            <motion.div className="space-y-6" initial={{ opacity: 0, x: 60 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.2 }} viewport={{ once: true }}>
-              <span className="text-pink-500 font-medium">Register Now</span>
-              <h2 className="text-4xl font-bold text-gray-900">
-                Want to access our
-                <br />
-                <em className="text-gray-700">premium content?</em>
-              </h2>
-              <p className="text-gray-600">
-                Sometimes features require a short description.
-                <br />
-                This can be detailed description.
-              </p>
-              <div className="flex space-x-4">
-                <motion.button className="bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600 transition-colors" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  Register Now
-                </motion.button>
-                <button className="text-gray-900 px-6 py-3 border-b border-gray-900 hover:border-pink-500 hover:text-pink-500 transition-colors">Contact Us</button>
-              </div>
-            </motion.div>
+          {/* Read Time */}
+          <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs flex items-center">
+            <Clock className="w-3 h-3 mr-1" />
+            {post.readTime} min
           </div>
         </div>
-      </motion.section>
 
-      {/* Our Favorite Article Section */}
-      {data.favoritePosts.length > 0 && (
-        <section className="py-16 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div className="text-center mb-12" {...fadeInUp}>
-              <span className="text-pink-500 font-medium">Article Source</span>
-              <h2 className="text-4xl font-bold text-gray-900 mt-2">Our Favorite Article</h2>
-            </motion.div>
+        <div className={`p-${isCompact ? "4" : "6"}`}>
+          <h3 className={`font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors ${isFeatured ? "text-xl" : isCompact ? "text-base" : "text-lg"}`}>{post.title}</h3>
 
-            <motion.div className="grid md:grid-cols-2 gap-8 mb-8" variants={staggerChildren} initial="initial" whileInView="animate" viewport={{ once: true }}>
-              {data.favoritePosts.slice(0, 2).map((post, index) => (
-                <BlogPostCard key={post.slug} post={post} size="medium" />
-              ))}
-            </motion.div>
+          <p className={`text-gray-600 mb-4 line-clamp-${isCompact ? "2" : "3"} ${isCompact ? "text-sm" : "text-base"}`}>{post.description}</p>
 
-            {data.favoritePosts.length > 2 && (
-              <motion.div className="grid md:grid-cols-2 gap-8" variants={staggerChildren} initial="initial" whileInView="animate" viewport={{ once: true }}>
-                {data.favoritePosts.slice(2, 4).map((post, index) => (
-                  <BlogPostCard key={post.slug} post={post} size="medium" />
-                ))}
-              </motion.div>
-            )}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              {post.author.image ? (
+                <img src={post.author.image} alt={post.author.name} className="w-8 h-8 rounded-full object-cover" />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center">
+                  <User className="w-4 h-4 text-white" />
+                </div>
+              )}
+              <div>
+                <p className={`font-medium text-gray-900 ${isCompact ? "text-sm" : "text-base"}`}>{post.author.name}</p>
+                {post.author.jobTitle && !isCompact && <p className="text-xs text-gray-500">{post.author.jobTitle}</p>}
+              </div>
+            </div>
 
-            {/* Pagination */}
-            <motion.div className="flex justify-center items-center space-x-2 mt-12" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.4 }} viewport={{ once: true }}>
-              {[1, 2, 3, 4, 5, 6].map((page) => (
-                <button key={page} className={`w-8 h-8 rounded-full flex items-center justify-center text-sm transition-colors ${page === 1 ? "bg-pink-500 text-white" : "text-gray-600 hover:bg-gray-200"}`}>
-                  {page}
-                </button>
-              ))}
-              <button className="text-gray-600 hover:text-pink-500 transition-colors">
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </motion.div>
+            <div className={`text-right ${isCompact ? "text-xs" : "text-sm"} text-gray-500`}>{post.date}</div>
           </div>
-        </section>
-      )}
-    </>
+        </div>
+      </div>
+    </Link>
   );
-}
+};
+
+const Carousel: React.FC<{
+  children: React.ReactNode;
+  itemsPerView?: number;
+  title: string;
+  subtitle?: string;
+}> = ({ children, itemsPerView = 3, title, subtitle }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [itemsToShow, setItemsToShow] = useState(itemsPerView);
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  const childrenArray = React.Children.toArray(children);
+  const maxIndex = Math.max(0, childrenArray.length - itemsToShow);
+
+  useEffect(() => {
+    const updateItemsToShow = () => {
+      if (window.innerWidth >= 1280) setItemsToShow(itemsPerView);
+      else if (window.innerWidth >= 1024) setItemsToShow(Math.min(3, itemsPerView));
+      else if (window.innerWidth >= 768) setItemsToShow(2);
+      else setItemsToShow(1);
+    };
+
+    updateItemsToShow();
+    window.addEventListener("resize", updateItemsToShow);
+    return () => window.removeEventListener("resize", updateItemsToShow);
+  }, [itemsPerView]);
+
+  const goToPrevious = () => {
+    setCurrentIndex((prev) => Math.max(0, prev - 1));
+  };
+
+  const goToNext = () => {
+    setCurrentIndex((prev) => Math.min(maxIndex, prev + 1));
+  };
+
+  const canGoPrevious = currentIndex > 0;
+  const canGoNext = currentIndex < maxIndex;
+
+  return (
+    <div className="mb-16">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">{title}</h2>
+          {subtitle && <p className="text-gray-600">{subtitle}</p>}
+        </div>
+
+        <div className="flex space-x-2">
+          <button
+            onClick={goToPrevious}
+            disabled={!canGoPrevious}
+            className={`p-3 rounded-full border transition-all ${canGoPrevious ? "border-gray-300 hover:border-gray-400 text-gray-700 hover:bg-gray-50" : "border-gray-200 text-gray-300 cursor-not-allowed"}`}
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            onClick={goToNext}
+            disabled={!canGoNext}
+            className={`p-3 rounded-full border transition-all ${canGoNext ? "border-gray-300 hover:border-gray-400 text-gray-700 hover:bg-gray-50" : "border-gray-200 text-gray-300 cursor-not-allowed"}`}
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
+      <div className="overflow-hidden" ref={carouselRef}>
+        <div
+          className="flex transition-transform duration-500 ease-out"
+          style={{
+            transform: `translateX(-${(currentIndex * 100) / itemsToShow}%)`,
+            width: `${(childrenArray.length * 100) / itemsToShow}%`,
+          }}
+        >
+          {childrenArray.map((child, index) => (
+            <div key={index} className="px-3" style={{ width: `${100 / childrenArray.length}%` }}>
+              {child}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Carousel Indicators */}
+      <div className="flex justify-center mt-6 space-x-2">
+        {Array.from({ length: maxIndex + 1 }, (_, i) => (
+          <button key={i} onClick={() => setCurrentIndex(i)} className={`w-2 h-2 rounded-full transition-all ${i === currentIndex ? "bg-blue-600 w-8" : "bg-gray-300"}`} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const Pagination: React.FC<{
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}> = ({ currentPage, totalPages, onPageChange }) => {
+  const getPageNumbers = () => {
+    const pages = [];
+    const showPages = 5;
+    let start = Math.max(1, currentPage - Math.floor(showPages / 2));
+    const end = Math.min(totalPages, start + showPages - 1);
+
+    if (end - start + 1 < showPages) {
+      start = Math.max(1, end - showPages + 1);
+    }
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
+  };
+
+  return (
+    <div className="flex items-center justify-center space-x-2 mt-12">
+      <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage <= 1} className={`p-2 rounded-lg ${currentPage <= 1 ? "text-gray-400 cursor-not-allowed" : "text-gray-700 hover:bg-gray-100"}`}>
+        <ChevronLeft className="w-5 h-5" />
+      </button>
+
+      {getPageNumbers().map((page) => (
+        <button key={page} onClick={() => onPageChange(page)} className={`px-4 py-2 rounded-lg font-medium ${page === currentPage ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-gray-100"}`}>
+          {page}
+        </button>
+      ))}
+
+      <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage >= totalPages} className={`p-2 rounded-lg ${currentPage >= totalPages ? "text-gray-400 cursor-not-allowed" : "text-gray-700 hover:bg-gray-100"}`}>
+        <ChevronRight className="w-5 h-5" />
+      </button>
+    </div>
+  );
+};
+
+export const BlogSectionClient: React.FC<BlogSectionClientProps> = ({ data }) => {
+  const [currentPage, setCurrentPage] = useState(data.pagination.currentPage);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // In a real app, you'd update the URL and refetch data
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  return (
+    <section className="py-20 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Featured Posts Carousel */}
+        {data.featuredPosts.length > 0 && (
+          <Carousel title="Featured Stories" subtitle="Our editor's top picks this week" itemsPerView={2}>
+            {data.featuredPosts.map((post) => (
+              <BlogCard key={post.id} post={post} variant="featured" />
+            ))}
+          </Carousel>
+        )}
+
+        {/* Recommended Posts Carousel */}
+        {data.recommendedPosts.length > 0 && (
+          <Carousel title="Recommended for You" subtitle="Curated content based on trending topics" itemsPerView={3}>
+            {data.recommendedPosts.map((post) => (
+              <BlogCard key={post.id} post={post} variant="default" />
+            ))}
+          </Carousel>
+        )}
+
+        {/* Favorite Posts Carousel */}
+        {data.favoritePosts.length > 0 && (
+          <Carousel title="Reader Favorites" subtitle="Most loved articles by our community" itemsPerView={4}>
+            {data.favoritePosts.map((post) => (
+              <BlogCard key={post.id} post={post} variant="compact" />
+            ))}
+          </Carousel>
+        )}
+
+        {/* All Posts Grid */}
+        <div className="mt-20">
+          <div className="flex items-center justify-between mb-12">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">All Articles</h2>
+              <p className="text-gray-600">
+                {data.pagination.totalPosts} articles • Page {data.pagination.currentPage} of {data.pagination.totalPages}
+              </p>
+            </div>
+
+            <button className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 font-medium">
+              <span>View All Categories</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {data.allPosts.map((post) => (
+              <BlogCard key={post.id} post={post} variant="compact" />
+            ))}
+          </div>
+
+          {/* Pagination */}
+          {data.pagination.totalPages > 1 && <Pagination currentPage={currentPage} totalPages={data.pagination.totalPages} onPageChange={handlePageChange} />}
+        </div>
+
+        {/* Newsletter CTA */}
+        {/* <div className="mt-20 bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl p-12 text-center text-white">
+          <h3 className="text-3xl font-bold mb-4">Never Miss a Beauty Secret</h3>
+          <p className="text-lg mb-8 opacity-90">Get the latest tips, tutorials, and product reviews delivered to your inbox</p>
+          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+            <input type="email" placeholder="Enter your email" className="flex-1 px-6 py-3 rounded-full text-gray-900 focus:outline-none focus:ring-4 focus:ring-white/30" />
+            <button className="px-8 py-3 bg-white text-purple-600 font-semibold rounded-full hover:bg-gray-100 transition-colors">Subscribe</button>
+          </div>
+        </div> */}
+      </div>
+    </section>
+  );
+};
