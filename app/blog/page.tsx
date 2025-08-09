@@ -5,40 +5,6 @@ import { type SanityDocument } from "next-sanity";
 import { Metadata } from "next";
 import { BlogListingClient } from "@/components/blog-listing-client";
 
-// Enhanced queries matching your schema structure
-// const BLOG_POSTS_QUERY = `*[_type == "post"] | order(publishedAt desc) [$start...$end] {
-//   _id,
-//   title,
-//   excerpt,
-//   slug,
-//   mainImage{
-//     asset,
-//     alt
-//   },
-//   category->{
-//     title,
-//     slug,
-//     color,
-//     icon
-//   },
-//   author->{
-//     name,
-//     slug,
-//     image,
-//     jobTitle,
-//     shortBio
-//   },
-//   publishedAt,
-//   readTime,
-//   tags,
-//   featured,
-//   recommended,
-//   favorite,
-//   premium
-// }`;
-
-// const BLOG_COUNT_QUERY = `count(*[_type == "post"])`;
-
 const CATEGORIES_QUERY = `*[_type == "category"] | order(title asc) {
   title,
   slug,
@@ -72,7 +38,19 @@ const FEATURED_POSTS_QUERY = `*[_type == "post" && featured == true] | order(pub
   publishedAt,
   readTime,
   tags,
-  premium
+  premium,
+  featured,
+  recommended,
+  favorite
+}`;
+
+// Query to get all available tags and authors for filtering
+const AVAILABLE_FILTERS_QUERY = `{
+  "tags": array::unique(*[_type == "post"].tags[]),
+  "authors": *[_type == "author"] | order(name asc) {
+    name,
+    slug
+  }
 }`;
 
 const POSTS_PER_PAGE = 12;
@@ -108,7 +86,9 @@ export default async function BlogPage({ searchParams }: { searchParams: SearchP
     }
 
     if (searchTerm) {
-      filters.push(`(title match "${searchTerm}*" || excerpt match "${searchTerm}*" || pt::text(body) match "${searchTerm}*")`);
+      // Improved search to handle special characters and partial matches
+      const escapedSearchTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      filters.push(`(title match "*${escapedSearchTerm}*" || excerpt match "*${escapedSearchTerm}*" || pt::text(body) match "*${escapedSearchTerm}*")`);
     }
 
     if (selectedTag) {
@@ -119,7 +99,7 @@ export default async function BlogPage({ searchParams }: { searchParams: SearchP
       filters.push(`author->slug.current == "${selectedAuthor}"`);
     }
 
-    return filters.length > 0 ? `&& ${filters.join(" && ")}` : "";
+    return filters.length > 0 ? `&& (${filters.join(" && ")})` : "";
   };
 
   const filterCondition = buildFilters();
@@ -161,12 +141,13 @@ export default async function BlogPage({ searchParams }: { searchParams: SearchP
   const end = start + POSTS_PER_PAGE;
 
   // Fetch data
-  const [posts, totalPosts, categories, featuredPosts] = await Promise.all([
+  const [posts, totalPosts, categories, featuredPosts, availableFilters] = await Promise.all([
     client.fetch<SanityDocument[]>(postsQuery, { start, end }, options),
     client.fetch<number>(countQuery, {}, options),
     client.fetch<SanityDocument[]>(CATEGORIES_QUERY, {}, options),
     // Only fetch featured posts if no filters are applied
     !selectedCategory && !searchTerm && !selectedTag && !selectedAuthor && currentPage === 1 ? client.fetch<SanityDocument[]>(FEATURED_POSTS_QUERY, {}, options) : Promise.resolve([]),
+    client.fetch<{ tags: string[]; authors: SanityDocument[] }>(AVAILABLE_FILTERS_QUERY, {}, options),
   ]);
 
   const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE);
@@ -226,7 +207,7 @@ export default async function BlogPage({ searchParams }: { searchParams: SearchP
   // Transform post data
   const transformPost = (post: SanityDocument) => ({
     id: post._id,
-    category: post.category?.title?.toUpperCase() || "GENERAL",
+    category: post.category?.title || "GENERAL",
     categoryColor: getCategoryColor(post.category),
     categoryIcon: getCategoryIconUrl(post.category?.icon),
     title: post.title || "",
@@ -281,23 +262,22 @@ export default async function BlogPage({ searchParams }: { searchParams: SearchP
       selectedAuthor: selectedAuthor || "",
     },
 
-    // Get all unique tags and authors for filter options
+    // Use the fetched available filters instead of deriving from current posts
     availableFilters: {
-      tags: Array.from(new Set(posts?.flatMap((post) => post.tags || []) || [])),
-      authors: [
-        ...Array.from(
-          new Set(
-            posts?.map((post) =>
-              JSON.stringify({
-                name: post.author?.name || "Anonymous",
-                slug: post.author?.slug?.current || "",
-              })
-            ) || []
-          )
-        ).map((authorStr) => JSON.parse(authorStr)),
-      ].filter((author, index, self) => index === self.findIndex((a) => a.slug === author.slug)),
+      tags: availableFilters?.tags?.filter(Boolean) || [],
+      authors:
+        availableFilters?.authors
+          ?.map((author) => ({
+            name: author.name || "Anonymous",
+            slug: author.slug?.current || "",
+          }))
+          .filter((author) => author.slug) || [],
     },
   };
+
+  console.log("Filter condition:", filterCondition);
+  console.log("Total posts found:", totalPosts);
+  console.log("Posts returned:", posts?.length);
 
   return <BlogListingClient data={blogData} />;
 }

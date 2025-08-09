@@ -3,9 +3,10 @@
 
 import React, { useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Search, Filter, ChevronLeft, ChevronRight, Clock, User, Calendar, Star, Lock, Tag, X } from "lucide-react";
+import { Search, Filter, ChevronLeft, ChevronRight, Tag, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
+import { BlogCard } from "@/components/blog-card";
 
 // Updated interfaces to match the blog page data structure
 interface Author {
@@ -134,10 +135,6 @@ export function BlogListingClient({ data }: BlogListingClientProps) {
     updateUrlParams({ tag: tag || null });
   };
 
-  const handleAuthorFilter = (authorSlug: string) => {
-    updateUrlParams({ author: authorSlug || null });
-  };
-
   const handlePageChange = (page: number) => {
     updateUrlParams({ page: page.toString() });
   };
@@ -173,101 +170,6 @@ export function BlogListingClient({ data }: BlogListingClientProps) {
 
     updateUrlParams(updates);
   };
-
-  const BlogPostCard = ({ post, size = "medium" }: { post: BlogPost; size?: "large" | "medium" | "small" }) => (
-    <motion.article className="group cursor-pointer bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100" variants={fadeInUp} whileHover={{ y: -5 }}>
-      <a href={`/blog/${post.slug}`} className="block">
-        <div className={`relative overflow-hidden ${size === "large" ? "h-64" : size === "medium" ? "h-48" : "h-40"}`}>
-          {post.imageUrl ? (
-            <Image src={post.imageUrl} alt={post.imageAlt} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center" style={{ backgroundColor: `${post.categoryColor}20` }}>
-              <span className="text-gray-500 text-lg font-medium">No Image</span>
-            </div>
-          )}
-
-          {/* Badges */}
-          <div className="absolute top-3 left-3 flex space-x-2">
-            {post.featured && (
-              <span className="bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center shadow-sm">
-                <Star className="w-3 h-3 mr-1" />
-                Featured
-              </span>
-            )}
-            {post.premium && (
-              <span className="bg-purple-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center shadow-sm">
-                <Lock className="w-3 h-3 mr-1" />
-                Premium
-              </span>
-            )}
-            {post.recommended && <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium shadow-sm">Recommended</span>}
-          </div>
-
-          {/* Category Badge */}
-          <div className="absolute top-3 right-3">
-            <span className="bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold shadow-sm flex items-center" style={{ color: post.categoryColor }}>
-              {post.categoryIcon && <Image src={post.categoryIcon} alt="" width={16} height={16} className="mr-1" />}
-              {post.category}
-            </span>
-          </div>
-        </div>
-
-        <div className="p-6">
-          <h3 className={`font-bold text-gray-900 mb-3 group-hover:transition-colors line-clamp-2 ${size === "large" ? "text-xl" : "text-lg"}`}>{post.title}</h3>
-
-          <p className="text-gray-600 mb-4 line-clamp-3">{post.description}</p>
-
-          {/* Tags */}
-          {post.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-4">
-              {post.tags.slice(0, 3).map((tag, index) => (
-                <span
-                  key={index}
-                  className="text-xs px-2 py-1 rounded-full cursor-pointer hover:opacity-80 transition-opacity"
-                  style={{ backgroundColor: `${post.categoryColor}15`, color: post.categoryColor }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleTagFilter(tag);
-                  }}
-                >
-                  #{tag}
-                </span>
-              ))}
-              {post.tags.length > 3 && <span className="text-xs text-gray-500">+{post.tags.length - 3}</span>}
-            </div>
-          )}
-
-          {/* Meta Information */}
-          <div className="flex items-center justify-between text-sm text-gray-500">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-1">
-                {post.author.image ? <Image src={post.author.image} alt={post.author.name} width={20} height={20} className="rounded-full" /> : <User className="w-4 h-4" />}
-                <span
-                  className="hover:text-gray-700 cursor-pointer"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleAuthorFilter(post.author.slug);
-                  }}
-                >
-                  {post.author.name}
-                </span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <Clock className="w-4 h-4" />
-                <span>{post.readTime} min</span>
-              </div>
-            </div>
-            <div className="flex items-center space-x-1">
-              <Calendar className="w-4 h-4" />
-              <span>{post.date}</span>
-            </div>
-          </div>
-        </div>
-      </a>
-    </motion.article>
-  );
 
   const hasActiveFilters = data.filters.selectedCategory || data.filters.searchTerm || data.filters.selectedTag || data.filters.selectedAuthor;
   const shouldShowFeatured = !hasActiveFilters && data.pagination.currentPage === 1 && data.featuredPosts.length > 0;
@@ -310,7 +212,9 @@ export function BlogListingClient({ data }: BlogListingClientProps) {
 
             <motion.div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8" variants={staggerChildren} initial="initial" whileInView="animate" viewport={{ once: true }}>
               {data.featuredPosts.slice(0, 6).map((post) => (
-                <BlogPostCard key={post.id} post={post} size="medium" />
+                <motion.div key={post.id} variants={fadeInUp}>
+                  <BlogCard post={post} variant="featured" />
+                </motion.div>
               ))}
             </motion.div>
           </div>
@@ -432,28 +336,6 @@ export function BlogListingClient({ data }: BlogListingClientProps) {
                     </div>
                   </div>
                 )}
-
-                {/* Authors */}
-                {data.availableFilters.authors.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
-                      <User className="w-5 h-5 mr-2" />
-                      Authors
-                    </h3>
-                    <ul className="space-y-2">
-                      {data.availableFilters.authors.slice(0, 8).map((author) => (
-                        <li key={author.slug}>
-                          <button
-                            onClick={() => handleAuthorFilter(author.slug)}
-                            className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${data.filters.selectedAuthor === author.slug ? "bg-purple-100 text-purple-700 font-medium" : "hover:bg-gray-100"}`}
-                          >
-                            {author.name}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
               </div>
             </div>
 
@@ -462,7 +344,9 @@ export function BlogListingClient({ data }: BlogListingClientProps) {
               {data.posts.length > 0 ? (
                 <motion.div className="grid md:grid-cols-2 gap-6" variants={staggerChildren} initial="initial" whileInView="animate" viewport={{ once: true }}>
                   {data.posts.map((post) => (
-                    <BlogPostCard key={post.id} post={post} />
+                    <motion.div key={post.id} variants={fadeInUp}>
+                      <BlogCard post={post} variant="default" />
+                    </motion.div>
                   ))}
                 </motion.div>
               ) : (

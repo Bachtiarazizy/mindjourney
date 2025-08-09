@@ -108,18 +108,10 @@ export default async function PostPage({ params }: { params: { slug: string } })
     });
   };
 
-  // Get category color or default
-  const categoryColor = post.category?.color?.hex || "#ec4899";
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Article Header */}
-      <div
-        className="text-white py-16 relative overflow-hidden"
-        style={{
-          background: `linear-gradient(135deg, ${categoryColor} 0%, ${categoryColor}dd 100%)`,
-        }}
-      >
+      <div className="bg-gradient-to-br from-[#4460a6] via-[#36539b] to-[#527ff0] text-white py-20 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-6">
@@ -129,50 +121,9 @@ export default async function PostPage({ params }: { params: { slug: string } })
             </Link>
           </div>
 
-          <div className="flex flex-wrap gap-2 mb-6">
-            <Link href={`/blog?category=${post.category?.slug?.current || ""}`} className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium hover:bg-white/30 transition-colors flex items-center">
-              {post.category?.icon && <Image src={urlForImage(post.category.icon)?.url() || ""} alt="" width={16} height={16} className="mr-2 rounded" />}
-              {post.category?.title || "General"}
-            </Link>
-
-            {post.featured && (
-              <span className="bg-yellow-400/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium flex items-center">
-                <Star className="w-4 h-4 mr-1 fill-current" />
-                Featured
-              </span>
-            )}
-
-            {post.premium && (
-              <span className="bg-purple-400/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium flex items-center">
-                <Lock className="w-4 h-4 mr-1" />
-                Premium
-              </span>
-            )}
-          </div>
-
           <div className="max-w-4xl">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">{post.title}</h1>
-            <p className="text-xl opacity-90 max-w-3xl mb-8 leading-relaxed">{post.excerpt}</p>
-
-            <div className="flex flex-wrap items-center gap-6 text-sm">
-              <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
-                {authorImageUrl ? <Image src={authorImageUrl} alt={post.author?.name} width={32} height={32} className="rounded-full mr-3" /> : <div className="bg-white/20 rounded-full w-8 h-8 mr-3" />}
-                <div>
-                  <div className="font-medium">{post.author?.name || "Anonymous"}</div>
-                  {post.author?.jobTitle && <div className="text-xs opacity-75">{post.author.jobTitle}</div>}
-                </div>
-              </div>
-
-              <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
-                <Calendar className="w-4 h-4 mr-2" />
-                <span>{formatDate(post.publishedAt)}</span>
-              </div>
-
-              <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
-                <Clock className="w-4 h-4 mr-2" />
-                <span>{post.readTime || 5} min read</span>
-              </div>
-            </div>
+            <h1 className="text-3xl md:text-4xl font-bold mb-6 leading-tight">{post.title}</h1>
+            <p className="text-large opacity-90 max-w-3xl mb-8 leading-relaxed">{post.excerpt}</p>
           </div>
         </div>
       </div>
@@ -189,30 +140,33 @@ export default async function PostPage({ params }: { params: { slug: string } })
               )}
 
               <div className="p-8 md:p-12">
-                {/* Enhanced Typography for Content */}
-                <div
-                  className="prose prose-xl max-w-none 
-                  prose-headings:font-bold prose-headings:tracking-tight
-                  prose-h1:text-4xl prose-h1:mb-8 prose-h1:leading-tight
-                  prose-h2:text-3xl prose-h2:mb-6 prose-h2:mt-12 prose-h2:pb-2 prose-h2:border-b prose-h2:border-gray-200
-                  prose-h3:text-2xl prose-h3:mb-4 prose-h3:mt-8
-                  prose-h4:text-xl prose-h4:mb-3 prose-h4:mt-6
-                  prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-6
-                  prose-strong:text-gray-900 prose-strong:font-semibold
-                  prose-a:text-pink-600 prose-a:font-medium prose-a:no-underline hover:prose-a:underline hover:prose-a:text-pink-700
-                  prose-blockquote:border-l-4 prose-blockquote:border-pink-500 prose-blockquote:bg-pink-50 
-                  prose-blockquote:px-8 prose-blockquote:py-6 prose-blockquote:rounded-r-xl prose-blockquote:my-8
-                  prose-blockquote:text-pink-900 prose-blockquote:font-medium prose-blockquote:italic
-                  prose-ul:my-6 prose-ol:my-6
-                  prose-li:mb-2 prose-li:leading-relaxed
-                  prose-img:rounded-xl prose-img:shadow-lg prose-img:my-8
-                  prose-hr:border-gray-200 prose-hr:my-12
-                  prose-code:bg-gray-100 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm
-                  prose-pre:bg-gray-900 prose-pre:rounded-xl prose-pre:p-6 prose-pre:overflow-x-auto
-                "
-                >
-                  {Array.isArray(post.body) && <PortableText value={post.body} />}
+                {/* Article Meta */}
+                <div className="flex items-center justify-between mb-8 pb-8 border-b border-gray-100">
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center text-gray-600">
+                      <Calendar className="w-4 h-4 mr-2" />
+                      <span className="text-sm">{formatDate(post.publishedAt)}</span>
+                    </div>
+                    {post.readTime && (
+                      <div className="flex items-center text-gray-600">
+                        <Clock className="w-4 h-4 mr-2" />
+                        <span className="text-sm">{post.readTime} min read</span>
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    {post.category && (
+                      <div className="flex items-center">
+                        <div className="px-3 py-1 rounded-full text-xs font-medium text-white" style={{ backgroundColor: post.category.color?.hex || "#6b7280" }}>
+                          {post.category.title}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
+
+                {/* Enhanced Typography for Content */}
+                <div className="prose max-w-none">{Array.isArray(post.body) && <PortableText value={post.body} />}</div>
 
                 <div className="mt-16 pt-8 border-t border-gray-200">
                   <ShareButtons title={post.title} url={`/blog/${post.slug.current}`} excerpt={post.excerpt} />
@@ -250,7 +204,7 @@ export default async function PostPage({ params }: { params: { slug: string } })
                       </p>
 
                       <div className="flex items-center justify-between">
-                        <Link href={`/author/${post.author.slug?.current}`} className="text-pink-600 hover:text-pink-700 font-medium hover:underline">
+                        <Link href={`/blog`} className="text-pink-600 hover:text-pink-700 font-medium hover:underline">
                           View all articles by {post.author.name} →
                         </Link>
 
@@ -305,7 +259,6 @@ export default async function PostPage({ params }: { params: { slug: string } })
                         <div className="flex items-center">
                           {categoryIconUrl ? <Image src={categoryIconUrl} alt="" width={20} height={20} className="mr-3 rounded" /> : <div className="w-3 h-3 rounded-full mr-3" style={{ backgroundColor: categoryColor }}></div>}
                           <span className="font-medium group-hover:text-pink-600 transition-colors">{category.title}</span>
-                          {category.featured && <Star className="w-3 h-3 ml-2 text-yellow-500 fill-current" />}
                         </div>
                         <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{category.postCount}</span>
                       </Link>

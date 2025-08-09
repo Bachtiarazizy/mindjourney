@@ -98,22 +98,6 @@ export default async function AboutPage() {
                   )}
                 </div>
               )}
-
-              {/* Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold mb-1">{stats.totalPosts}+</div>
-                  <div className="text-sm text-white/80">Articles</div>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold mb-1">{stats.totalCategories}+</div>
-                  <div className="text-sm text-white/80">Topics</div>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center col-span-2 md:col-span-1">
-                  <div className="text-2xl font-bold mb-1">2024</div>
-                  <div className="text-sm text-white/80">Since</div>
-                </div>
-              </div>
             </div>
 
             {/* Profile Image */}
@@ -141,20 +125,11 @@ export default async function AboutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Bio Content */}
             <div className="lg:col-span-2">
-              <h2 className="text-4xl font-bold mb-8 text-gray-900">My Story</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-8 text-gray-900">My Story</h2>
 
               {author.bio && Array.isArray(author.bio) ? (
                 <div
-                  className="prose prose-xl max-w-none 
-                  prose-headings:font-bold prose-headings:tracking-tight
-                  prose-h2:text-3xl prose-h2:mb-6 prose-h2:mt-8
-                  prose-h3:text-2xl prose-h3:mb-4 prose-h3:mt-6
-                  prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-6
-                  prose-strong:text-gray-900 prose-strong:font-semibold
-                  prose-a:text-pink-600 prose-a:font-medium prose-a:no-underline hover:prose-a:underline
-                  prose-blockquote:border-l-4 prose-blockquote:border-pink-500 prose-blockquote:bg-pink-50 
-                  prose-blockquote:px-6 prose-blockquote:py-4 prose-blockquote:rounded-r-lg
-                  prose-ul:my-6 prose-ol:my-6 prose-li:mb-2
+                  className="prose max-w-none
                 "
                 >
                   <PortableText value={author.bio} />
@@ -208,48 +183,12 @@ export default async function AboutPage() {
                 <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-6 text-white">
                   <h3 className="text-xl font-bold mb-4">Let&apos;s Connect!</h3>
                   <p className="mb-4 text-white/90 text-sm">Have a question or want to collaborate? I&apos;d love to hear from you!</p>
-                  <Link href="/contact" className="bg-white text-purple-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center text-sm">
+                  <Link href="mailto:azkamusfirah@gmail.com" className="bg-white text-purple-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center text-sm">
                     <Mail className="w-4 h-4 mr-2" />
                     Get in Touch
                   </Link>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Values Section */}
-      <div className="py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-gray-900">What I Believe In</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">The principles that guide my content and approach to beauty and lifestyle</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow">
-              <div className="bg-pink-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Heart className="w-8 h-8 text-pink-600" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Authenticity</h3>
-              <p className="text-gray-600">Real experiences and honest opinions. No fluff, just genuine insights from my personal journey.</p>
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow">
-              <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Sparkles className="w-8 h-8 text-purple-600" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Quality Content</h3>
-              <p className="text-gray-600">Every post is crafted with care, research, and attention to detail to provide real value.</p>
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow md:col-span-2 lg:col-span-1">
-              <div className="bg-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Coffee className="w-8 h-8 text-yellow-600" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Community</h3>
-              <p className="text-gray-600">Building connections and learning from each other. Your feedback and stories inspire me every day.</p>
             </div>
           </div>
         </div>
@@ -265,7 +204,11 @@ export default async function AboutPage() {
               Read My Blog
               <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
-            <Link href="/contact" className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-pink-600 transition-colors inline-flex items-center justify-center">
+            <Link
+              href="mailto:azkamusfirah@gmail.com
+            "
+              className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-pink-600 transition-colors inline-flex items-center justify-center"
+            >
               Say Hello
             </Link>
           </div>

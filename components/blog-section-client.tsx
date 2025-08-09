@@ -2,8 +2,8 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import Link from "next/link";
-import { ChevronLeft, ChevronRight, Clock, User, ArrowRight, Crown } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import { BlogCard } from "./blog-card";
 
 interface Author {
   name: string;
@@ -49,75 +49,6 @@ interface BlogData {
 interface BlogSectionClientProps {
   data: BlogData;
 }
-
-const BlogCard: React.FC<{ post: BlogPost; variant?: "default" | "featured" | "compact" }> = ({ post, variant = "default" }) => {
-  const isCompact = variant === "compact";
-  const isFeatured = variant === "featured";
-
-  return (
-    <Link href={`/blog/${post.slug}`} className="block h-full">
-      <div className={`group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer ${isFeatured ? "lg:col-span-2" : ""} ${isCompact ? "h-full" : ""}`}>
-        <div className={`relative ${isCompact ? "aspect-[4/3]" : "aspect-[3/2]"} overflow-hidden`}>
-          {post.imageUrl ? (
-            <img src={post.imageUrl} alt={post.imageAlt} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-              <div className="text-gray-400 text-4xl">📝</div>
-            </div>
-          )}
-
-          {/* Category Badge */}
-          <div className="absolute top-4 left-4">
-            <div className="px-3 py-1 rounded-full text-xs font-semibold text-white backdrop-blur-sm" style={{ backgroundColor: `${post.categoryColor}CC` }}>
-              {post.categoryIcon && <img src={post.categoryIcon} alt="" className="inline w-3 h-3 mr-1" />}
-              {post.category}
-            </div>
-          </div>
-
-          {/* Premium Badge */}
-          {post.premium && (
-            <div className="absolute top-4 left-4 mt-8">
-              <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white px-2 py-1 rounded-full text-xs flex items-center font-semibold">
-                <Crown className="w-3 h-3 mr-1" />
-                Premium
-              </div>
-            </div>
-          )}
-
-          {/* Read Time */}
-          <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs flex items-center">
-            <Clock className="w-3 h-3 mr-1" />
-            {post.readTime} min
-          </div>
-        </div>
-
-        <div className={`p-${isCompact ? "4" : "6"}`}>
-          <h3 className={`font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors ${isFeatured ? "text-xl" : isCompact ? "text-base" : "text-lg"}`}>{post.title}</h3>
-
-          <p className={`text-gray-600 mb-4 line-clamp-${isCompact ? "2" : "3"} ${isCompact ? "text-sm" : "text-base"}`}>{post.description}</p>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              {post.author.image ? (
-                <img src={post.author.image} alt={post.author.name} className="w-8 h-8 rounded-full object-cover" />
-              ) : (
-                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center">
-                  <User className="w-4 h-4 text-white" />
-                </div>
-              )}
-              <div>
-                <p className={`font-medium text-gray-900 ${isCompact ? "text-sm" : "text-base"}`}>{post.author.name}</p>
-                {post.author.jobTitle && !isCompact && <p className="text-xs text-gray-500">{post.author.jobTitle}</p>}
-              </div>
-            </div>
-
-            <div className={`text-right ${isCompact ? "text-xs" : "text-sm"} text-gray-500`}>{post.date}</div>
-          </div>
-        </div>
-      </div>
-    </Link>
-  );
-};
 
 const Carousel: React.FC<{
   children: React.ReactNode;
@@ -265,15 +196,6 @@ export const BlogSectionClient: React.FC<BlogSectionClientProps> = ({ data }) =>
           <Carousel title="Featured Stories" subtitle="Our editor's top picks this week" itemsPerView={2}>
             {data.featuredPosts.map((post) => (
               <BlogCard key={post.id} post={post} variant="featured" />
-            ))}
-          </Carousel>
-        )}
-
-        {/* Recommended Posts Carousel */}
-        {data.recommendedPosts.length > 0 && (
-          <Carousel title="Recommended for You" subtitle="Curated content based on trending topics" itemsPerView={3}>
-            {data.recommendedPosts.map((post) => (
-              <BlogCard key={post.id} post={post} variant="default" />
             ))}
           </Carousel>
         )}
