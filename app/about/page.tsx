@@ -5,7 +5,7 @@ import { client, urlForImage } from "@/sanity/client";
 import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { Instagram, Twitter, Linkedin, Globe, Mail, Heart, Coffee, Sparkles } from "lucide-react";
+import { Mail, Heart, Coffee, Sparkles } from "lucide-react";
 
 // Query untuk mengambil author utama (bisa berdasarkan featured atau yang pertama)
 const AUTHOR_QUERY = `*[_type == "author"] | order(featured desc, _createdAt asc)[0] {
@@ -63,57 +63,39 @@ export default async function AboutPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-br from-pink-500 to-purple-600 text-white py-24 relative overflow-hidden">
+      <div
+        className="relative text-white py-24 min-h-screen flex items-center"
+        style={{
+          backgroundImage: "url(/azkaa.jpg)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/70"></div>
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Text Content */}
-            <div>
-              <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">Hi, I&apos;m {author.name}</h1>
-              {author.jobTitle && <p className="text-2xl text-white/90 mb-6 font-medium">{author.jobTitle}</p>}
-              <p className="text-xl opacity-90 mb-8 leading-relaxed">{author.shortBio || "Welcome to my personal space where I share my passion for beauty, lifestyle, and everything that inspires me."}</p>
-
-              {/* Social Links */}
-              {author.social && (
-                <div className="flex items-center gap-4 mb-8">
-                  {author.social.instagram && (
-                    <a href={author.social.instagram} className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:bg-white/30 transition-colors" target="_blank" rel="noopener noreferrer">
-                      <Instagram className="w-6 h-6" />
-                    </a>
-                  )}
-                  {author.social.twitter && (
-                    <a href={author.social.twitter} className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:bg-white/30 transition-colors" target="_blank" rel="noopener noreferrer">
-                      <Twitter className="w-6 h-6" />
-                    </a>
-                  )}
-                  {author.social.linkedin && (
-                    <a href={author.social.linkedin} className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:bg-white/30 transition-colors" target="_blank" rel="noopener noreferrer">
-                      <Linkedin className="w-6 h-6" />
-                    </a>
-                  )}
-                  {author.social.website && (
-                    <a href={author.social.website} className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:bg-white/30 transition-colors" target="_blank" rel="noopener noreferrer">
-                      <Globe className="w-6 h-6" />
-                    </a>
-                  )}
-                </div>
-              )}
-            </div>
-
             {/* Profile Image */}
-            <div className="flex justify-center lg:justify-end">
+            <div className="flex justify-start md:justify-center ">
               <div className="relative">
                 {authorImageUrl ? (
                   <Image src={authorImageUrl} alt={author.name} width={400} height={400} className="rounded-2xl shadow-2xl w-80 h-80 md:w-96 md:h-96 object-cover" priority />
                 ) : (
-                  <div className="rounded-2xl shadow-2xl w-80 h-80 md:w-96 md:h-96 bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                    <div className="text-white/60 text-6xl">👋</div>
+                  <div className="w-80 h-80 md:w-96 md:h-96 bg-gray-200 rounded-full flex items-center justify-center">
+                    <span className="text-gray-400 text-6xl">👤</span>
                   </div>
                 )}
-                <div className="absolute -top-4 -right-4 bg-yellow-400 text-yellow-900 p-3 rounded-full animate-pulse">
-                  <Sparkles className="w-6 h-6 fill-current" />
-                </div>
               </div>
+            </div>
+            {/* Text Content */}
+            <div>
+              <h1 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">
+                Hi, Aku <br /> {author.name}
+              </h1>
+              {author.jobTitle && <p className="text-2xl text-white mb-6 font-medium">{author.jobTitle}</p>}
+              <p className="text-xl opacity-90 mb-8 leading-relaxed">{author.shortBio || "Welcome to my personal space where I share my passion for beauty, lifestyle, and everything that inspires me."}</p>
             </div>
           </div>
         </div>
@@ -168,7 +150,7 @@ export default async function AboutPage() {
                     </div>
                     <div className="flex items-center">
                       <Sparkles className="w-4 h-4 mr-3 text-pink-600" />
-                      <span>Beauty experimenter</span>
+                      <span>Social Volunteer</span>
                     </div>
                     {stats.latestPost && (
                       <div className="pt-2 border-t border-pink-200">
@@ -193,27 +175,6 @@ export default async function AboutPage() {
           </div>
         </div>
       </div>
-
-      {/* CTA Section */}
-      {/* <div className="py-24 bg-gradient-to-br from-pink-500 to-purple-600">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">Ready to Join the Journey?</h2>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">Explore my latest posts, discover new favorites, and let&apos;s navigate the world of beauty and lifestyle together.</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/blog" className="bg-white text-pink-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors inline-flex items-center justify-center">
-              Read My Blog
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Link>
-            <Link
-              href="mailto:azkamusfirah@gmail.com
-            "
-              className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-pink-600 transition-colors inline-flex items-center justify-center"
-            >
-              Say Hello
-            </Link>
-          </div>
-        </div>
-      </div> */}
     </div>
   );
 }

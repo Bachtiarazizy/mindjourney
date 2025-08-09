@@ -154,7 +154,7 @@ export default async function PostPage({ params }: { params: { slug: string } })
               )}
               {post.author && (
                 <div className="flex items-center">
-                  {authorImageUrl ? <Image src={authorImageUrl} alt={post.author.name} width={24} height={24} className="rounded-full mr-2 object-cover" /> : <div className="w-6 h-6 bg-white/20 rounded-full mr-2"></div>}
+                  {authorImageUrl ? <Image src={authorImageUrl} alt={post.author.name} width={24} height={24} className="rounded-full mr-2 object-cover w-6 h-6" /> : <div className="w-6 h-6 bg-white/20 rounded-full mr-2"></div>}
                   <span className="text-sm">By {post.author.name}</span>
                 </div>
               )}
