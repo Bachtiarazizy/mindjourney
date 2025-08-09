@@ -180,8 +180,10 @@ export function BlogListingClient({ data }: BlogListingClientProps) {
       <section className="bg-gradient-to-br from-[#4460a6] via-[#36539b] to-[#527ff0] text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div className="text-center" {...fadeInUp}>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-pink-100 bg-clip-text text-transparent">Our Blog</h1>
-            <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">Discover insights, tips, and stories from our experts. Stay updated with the latest trends and knowledge.</p>
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-pink-100 bg-clip-text text-transparent">My Blog</h1>
+            <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
+              A small corner of the internet where I pour out stories, reflections, and quiet thoughts all shaped by my love for understanding people and the invisible threads that connect us.
+            </p>
 
             {/* Search Bar */}
             <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
@@ -213,7 +215,7 @@ export function BlogListingClient({ data }: BlogListingClientProps) {
             <motion.div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8" variants={staggerChildren} initial="initial" whileInView="animate" viewport={{ once: true }}>
               {data.featuredPosts.slice(0, 6).map((post) => (
                 <motion.div key={post.id} variants={fadeInUp}>
-                  <BlogCard post={post} variant="featured" />
+                  <BlogCard post={post} variant="compact" />
                 </motion.div>
               ))}
             </motion.div>

@@ -5,7 +5,7 @@ import { client, urlForImage } from "@/sanity/client";
 import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { Instagram, Twitter, Linkedin, Globe, Mail, Heart, Coffee, Sparkles, ArrowRight } from "lucide-react";
+import { Instagram, Twitter, Linkedin, Globe, Mail, Heart, Coffee, Sparkles } from "lucide-react";
 
 // Query untuk mengambil author utama (bisa berdasarkan featured atau yang pertama)
 const AUTHOR_QUERY = `*[_type == "author"] | order(featured desc, _createdAt asc)[0] {
@@ -195,7 +195,7 @@ export default async function AboutPage() {
       </div>
 
       {/* CTA Section */}
-      <div className="py-24 bg-gradient-to-br from-pink-500 to-purple-600">
+      {/* <div className="py-24 bg-gradient-to-br from-pink-500 to-purple-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold text-white mb-6">Ready to Join the Journey?</h2>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">Explore my latest posts, discover new favorites, and let&apos;s navigate the world of beauty and lifestyle together.</p>
@@ -213,7 +213,7 @@ export default async function AboutPage() {
             </Link>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

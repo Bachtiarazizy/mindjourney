@@ -31,7 +31,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="text-center mt-8 pt-8 border-t border-[#4460a6]">
+        <div className="text-center mt-8 pt-8 border-t border-white">
           <p className="">Copyright © 2025 - All Rights Reserved</p>
         </div>
       </div>

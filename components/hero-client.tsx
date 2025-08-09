@@ -39,16 +39,10 @@ export function HeroClient({ data }: HeroClientProps) {
             </div>
 
             <div>
-              <h1 className="text-5xl md:text-6xl font-bold text-gray-900 leading-tight mb-6">
-                {data.headline.includes("Aesthetics & Beauty.") ? (
-                  <>
-                    {data.headline.split("Aesthetics & Beauty.")[0]}
-                    <br />
-                    <em className="text-gray-700">Aesthetics & Beauty.</em>
-                  </>
-                ) : (
-                  <span dangerouslySetInnerHTML={{ __html: data.headline.replace(/\n/g, "<br />") }} />
-                )}
+              <h1 className="text-3xl md:text-6xl font-bold text-gray-900 leading-tight tracking-wide mb-6">
+                All Article About
+                <br className="mt-2" />
+                My Mindjourney.
               </h1>
 
               {/* featured or latest post image and url later */}

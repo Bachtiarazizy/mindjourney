@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { BlogCard } from "./blog-card";
 
@@ -58,23 +58,36 @@ const Carousel: React.FC<{
 }> = ({ children, itemsPerView = 3, title, subtitle }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [itemsToShow, setItemsToShow] = useState(itemsPerView);
-  const carouselRef = useRef<HTMLDivElement>(null);
 
   const childrenArray = React.Children.toArray(children);
+
+  // Fix: Pastikan maxIndex tidak negatif dan sesuai dengan jumlah item
   const maxIndex = Math.max(0, childrenArray.length - itemsToShow);
+
+  // Fix: Jika item kurang dari itemsToShow, set currentIndex ke 0
+  const effectiveIndex = childrenArray.length <= itemsToShow ? 0 : Math.min(currentIndex, maxIndex);
 
   useEffect(() => {
     const updateItemsToShow = () => {
-      if (window.innerWidth >= 1280) setItemsToShow(itemsPerView);
-      else if (window.innerWidth >= 1024) setItemsToShow(Math.min(3, itemsPerView));
-      else if (window.innerWidth >= 768) setItemsToShow(2);
+      const width = window.innerWidth;
+
+      if (width >= 1280) setItemsToShow(Math.min(itemsPerView, childrenArray.length));
+      else if (width >= 1024) setItemsToShow(Math.min(3, itemsPerView, childrenArray.length));
+      else if (width >= 768) setItemsToShow(Math.min(2, childrenArray.length));
       else setItemsToShow(1);
     };
 
     updateItemsToShow();
     window.addEventListener("resize", updateItemsToShow);
     return () => window.removeEventListener("resize", updateItemsToShow);
-  }, [itemsPerView]);
+  }, [itemsPerView, childrenArray.length]);
+
+  // Fix: Reset currentIndex jika melebihi maxIndex setelah resize
+  useEffect(() => {
+    if (currentIndex > maxIndex) {
+      setCurrentIndex(maxIndex);
+    }
+  }, [maxIndex, currentIndex]);
 
   const goToPrevious = () => {
     setCurrentIndex((prev) => Math.max(0, prev - 1));
@@ -84,56 +97,64 @@ const Carousel: React.FC<{
     setCurrentIndex((prev) => Math.min(maxIndex, prev + 1));
   };
 
-  const canGoPrevious = currentIndex > 0;
-  const canGoNext = currentIndex < maxIndex;
+  const canGoPrevious = effectiveIndex > 0;
+  const canGoNext = effectiveIndex < maxIndex && childrenArray.length > itemsToShow;
+
+  // Fix: Jika jumlah item <= itemsToShow, jangan tampilkan navigation
+  const showNavigation = childrenArray.length > itemsToShow;
 
   return (
     <div className="mb-16">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">{title}</h2>
+          <h2 className="md:text-3xl text-xl font-bold text-gray-900 mb-2">{title}</h2>
           {subtitle && <p className="text-gray-600">{subtitle}</p>}
         </div>
 
-        <div className="flex space-x-2">
-          <button
-            onClick={goToPrevious}
-            disabled={!canGoPrevious}
-            className={`p-3 rounded-full border transition-all ${canGoPrevious ? "border-gray-300 hover:border-gray-400 text-gray-700 hover:bg-gray-50" : "border-gray-200 text-gray-300 cursor-not-allowed"}`}
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <button
-            onClick={goToNext}
-            disabled={!canGoNext}
-            className={`p-3 rounded-full border transition-all ${canGoNext ? "border-gray-300 hover:border-gray-400 text-gray-700 hover:bg-gray-50" : "border-gray-200 text-gray-300 cursor-not-allowed"}`}
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
+        {/* Navigation buttons - hanya tampil jika diperlukan */}
+        {showNavigation && (
+          <div className="flex space-x-2">
+            <button
+              onClick={goToPrevious}
+              disabled={!canGoPrevious}
+              className={`p-3 rounded-full border transition-all ${canGoPrevious ? "border-gray-300 hover:border-gray-400 text-gray-700 hover:bg-gray-50" : "border-gray-200 text-gray-300 cursor-not-allowed"}`}
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={goToNext}
+              disabled={!canGoNext}
+              className={`p-3 rounded-full border transition-all ${canGoNext ? "border-gray-300 hover:border-gray-400 text-gray-700 hover:bg-gray-50" : "border-gray-200 text-gray-300 cursor-not-allowed"}`}
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        )}
       </div>
 
-      <div className="overflow-hidden" ref={carouselRef}>
+      <div className="overflow-hidden">
         <div
-          className="flex transition-transform duration-500 ease-out"
+          className="flex transition-transform duration-300 ease-out"
           style={{
-            transform: `translateX(-${(currentIndex * 100) / itemsToShow}%)`,
+            // Fix: Transform yang konsisten untuk semua ukuran layar
+            transform: `translateX(-${effectiveIndex * (100 / itemsToShow)}%)`,
+            // Fix: Width container yang konsisten
             width: `${(childrenArray.length * 100) / itemsToShow}%`,
           }}
         >
           {childrenArray.map((child, index) => (
-            <div key={index} className="px-3" style={{ width: `${100 / childrenArray.length}%` }}>
+            <div
+              key={index}
+              className="px-3 flex-shrink-0"
+              style={{
+                // Fix: Width per item yang konsisten
+                width: `${100 / childrenArray.length}%`,
+              }}
+            >
               {child}
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Carousel Indicators */}
-      <div className="flex justify-center mt-6 space-x-2">
-        {Array.from({ length: maxIndex + 1 }, (_, i) => (
-          <button key={i} onClick={() => setCurrentIndex(i)} className={`w-2 h-2 rounded-full transition-all ${i === currentIndex ? "bg-blue-600 w-8" : "bg-gray-300"}`} />
-        ))}
       </div>
     </div>
   );
@@ -193,16 +214,16 @@ export const BlogSectionClient: React.FC<BlogSectionClientProps> = ({ data }) =>
       <div className="max-w-7xl mx-auto px-6">
         {/* Featured Posts Carousel */}
         {data.featuredPosts.length > 0 && (
-          <Carousel title="Featured Stories" subtitle="Our editor's top picks this week" itemsPerView={2}>
+          <Carousel title="What I'm Excited to Share" subtitle="The pieces I can't wait for you to read right now." itemsPerView={3}>
             {data.featuredPosts.map((post) => (
-              <BlogCard key={post.id} post={post} variant="featured" />
+              <BlogCard key={post.id} post={post} variant="compact" />
             ))}
           </Carousel>
         )}
 
         {/* Favorite Posts Carousel */}
         {data.favoritePosts.length > 0 && (
-          <Carousel title="Reader Favorites" subtitle="Most loved articles by our community" itemsPerView={4}>
+          <Carousel title="Close to My Heart" subtitle="Stories and reflections that mean the most to me (and, I hope, to you too)." itemsPerView={4}>
             {data.favoritePosts.map((post) => (
               <BlogCard key={post.id} post={post} variant="compact" />
             ))}
@@ -213,10 +234,8 @@ export const BlogSectionClient: React.FC<BlogSectionClientProps> = ({ data }) =>
         <div className="mt-20">
           <div className="flex items-center justify-between mb-12">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">All Articles</h2>
-              <p className="text-gray-600">
-                {data.pagination.totalPosts} articles • Page {data.pagination.currentPage} of {data.pagination.totalPages}
-              </p>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Every Story So Far</h2>
+              <p className="text-gray-600">A little library of everything I&lsquo;ve written — from everyday thoughts to deeper reflections.</p>
             </div>
 
             <button className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 font-medium">
@@ -234,16 +253,6 @@ export const BlogSectionClient: React.FC<BlogSectionClientProps> = ({ data }) =>
           {/* Pagination */}
           {data.pagination.totalPages > 1 && <Pagination currentPage={currentPage} totalPages={data.pagination.totalPages} onPageChange={handlePageChange} />}
         </div>
-
-        {/* Newsletter CTA */}
-        {/* <div className="mt-20 bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl p-12 text-center text-white">
-          <h3 className="text-3xl font-bold mb-4">Never Miss a Beauty Secret</h3>
-          <p className="text-lg mb-8 opacity-90">Get the latest tips, tutorials, and product reviews delivered to your inbox</p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <input type="email" placeholder="Enter your email" className="flex-1 px-6 py-3 rounded-full text-gray-900 focus:outline-none focus:ring-4 focus:ring-white/30" />
-            <button className="px-8 py-3 bg-white text-purple-600 font-semibold rounded-full hover:bg-gray-100 transition-colors">Subscribe</button>
-          </div>
-        </div> */}
       </div>
     </section>
   );

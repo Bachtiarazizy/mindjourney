@@ -1,4 +1,4 @@
-import { Clock, Crown, User } from "lucide-react";
+import { Clock, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -68,16 +68,6 @@ export const BlogCard: React.FC<{ post: BlogPost; variant?: "default" | "feature
             </div>
           </div>
 
-          {/* Premium Badge */}
-          {post.premium && (
-            <div className="absolute top-4 left-4 mt-8">
-              <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white px-2 py-1 rounded-full text-xs flex items-center font-semibold">
-                <Crown className="w-3 h-3 mr-1" />
-                Premium
-              </div>
-            </div>
-          )}
-
           {/* Read Time */}
           <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs flex items-center">
             <Clock className="w-3 h-3 mr-1" />
@@ -86,7 +76,7 @@ export const BlogCard: React.FC<{ post: BlogPost; variant?: "default" | "feature
         </div>
 
         <div className={`p-${isCompact ? "4" : "6"}`}>
-          <h3 className={`font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors ${isFeatured ? "text-xl" : isCompact ? "text-base" : "text-lg"}`}>{post.title}</h3>
+          <h3 className={`font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-gray-900/60 transition-colors ${isFeatured ? "text-xl" : isCompact ? "text-base" : "text-lg"}`}>{post.title}</h3>
 
           <p className={`text-gray-600 mb-4 line-clamp-${isCompact ? "2" : "3"} ${isCompact ? "text-sm" : "text-base"}`}>{post.description}</p>
 

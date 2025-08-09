@@ -100,7 +100,7 @@
 }
 
 .prose h4 {
-  font-size: 1.25rem; /* 20px */
+  font-size: 1.125rem; /* 20px */
   line-height: 1.75rem; /* 28px */
   margin-top: 1.5em;
   margin-bottom: 0.5em;
@@ -125,20 +125,42 @@
 }
 
 .prose p {
-  margin-bottom: 1.25em;
+  margin-bottom: 1.1em;
   line-height: 1.6;
   color: #374151;
   font-size: 1rem; /* 16px - ukuran standar yang lebih kecil */
 }
 
 .prose blockquote {
-  font-style: italic;
+  font-style: normal; /* hilangkan italic biar tegas */
+  font-weight: 700; /* tebal */
+  font-size: 1.1rem; /* 24px, bisa sesuaikan */
+  line-height: 2rem; /* 32px */
   background: #f9fafb;
-  padding: 1rem;
+  padding: 1.5rem;
   border-radius: 0.5rem;
   border-left: 4px solid #3b82f6;
   margin: 1.5em 0;
+  color: #111827;
 }
+
+/* .prose blockquote::before {
+  content: "“";
+  font-size: 2rem;
+  font-weight: bold;
+  line-height: 1;
+  color: #3b82f6;
+  margin-right: 0.25rem;
+}
+
+.prose blockquote::after {
+  content: "”";
+  font-size: 2rem;
+  font-weight: bold;
+  line-height: 1;
+  color: #3b82f6;
+  margin-left: 0.25rem;
+} */
 
 .prose a {
   color: #3b82f6;
@@ -160,16 +182,57 @@
   color: #6b7280;
 }
 
-.prose ul,
+/* Unordered List - custom bullet */
+.prose ul {
+  list-style-type: none; /* hilangkan default bullet */
+  padding-left: 1.5em; /* kasih space kiri */
+}
+
+.prose ul li {
+  position: relative;
+  padding-left: 1.2em;
+  margin-bottom: 0.5em;
+  color: #374151;
+  line-height: 1.7;
+}
+
+/* custom bullet: bulatan kecil berwarna */
+.prose ul li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.7em; /* sesuaikan vertikal */
+  width: 0.5em;
+  height: 0.5em;
+  background-color: #3b82f6; /* biru */
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Ordered List - nomor custom */
 .prose ol {
-  margin: 1.25em 0;
+  list-style: none; /* hilangkan default nomor */
+  counter-reset: item;
   padding-left: 1.5em;
 }
 
-.prose li {
+.prose ol li {
+  position: relative;
+  padding-left: 2em;
   margin-bottom: 0.5em;
+  color: #000;
   line-height: 1.7;
-  color: #374151;
+  counter-increment: item;
+}
+
+/* nomor custom styling */
+.prose ol li::before {
+  content: counter(item) ".";
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: 600;
+  color: #000000;
 }
 
 .prose code {
