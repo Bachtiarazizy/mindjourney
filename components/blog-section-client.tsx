@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { BlogCard } from "./blog-card";
 
@@ -55,106 +55,187 @@ const Carousel: React.FC<{
   itemsPerView?: number;
   title: string;
   subtitle?: string;
+  gap?: number;
 }> = ({ children, itemsPerView = 3, title, subtitle }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [itemsToShow, setItemsToShow] = useState(itemsPerView);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const childrenArray = React.Children.toArray(children);
+  const totalItems = childrenArray.length;
 
-  // Fix: Pastikan maxIndex tidak negatif dan sesuai dengan jumlah item
-  const maxIndex = Math.max(0, childrenArray.length - itemsToShow);
+  // Responsive breakpoints
+  const updateItemsToShow = useCallback(() => {
+    const width = window.innerWidth;
 
-  // Fix: Jika item kurang dari itemsToShow, set currentIndex ke 0
-  const effectiveIndex = childrenArray.length <= itemsToShow ? 0 : Math.min(currentIndex, maxIndex);
+    let newItemsToShow;
+    if (width < 640) {
+      newItemsToShow = 1; // mobile
+    } else if (width < 768) {
+      newItemsToShow = Math.min(2, itemsPerView); // small tablet
+    } else if (width < 1024) {
+      newItemsToShow = Math.min(2, itemsPerView); // tablet
+    } else if (width < 1280) {
+      newItemsToShow = Math.min(3, itemsPerView); // laptop
+    } else {
+      newItemsToShow = itemsPerView; // desktop
+    }
+
+    // Ensure we don't show more items than available
+    newItemsToShow = Math.min(newItemsToShow, totalItems);
+
+    setItemsToShow(newItemsToShow);
+
+    // Reset index if it's out of bounds
+    const maxIndex = Math.max(0, totalItems - newItemsToShow);
+    setCurrentIndex((prev) => Math.min(prev, maxIndex));
+  }, [itemsPerView, totalItems]);
 
   useEffect(() => {
-    const updateItemsToShow = () => {
-      const width = window.innerWidth;
-
-      if (width >= 1280) setItemsToShow(Math.min(itemsPerView, childrenArray.length));
-      else if (width >= 1024) setItemsToShow(Math.min(3, itemsPerView, childrenArray.length));
-      else if (width >= 768) setItemsToShow(Math.min(2, childrenArray.length));
-      else setItemsToShow(1);
-    };
-
     updateItemsToShow();
     window.addEventListener("resize", updateItemsToShow);
     return () => window.removeEventListener("resize", updateItemsToShow);
-  }, [itemsPerView, childrenArray.length]);
+  }, [updateItemsToShow]);
 
-  // Fix: Reset currentIndex jika melebihi maxIndex setelah resize
-  useEffect(() => {
-    if (currentIndex > maxIndex) {
-      setCurrentIndex(maxIndex);
-    }
-  }, [maxIndex, currentIndex]);
+  // Calculate boundaries
+  const maxIndex = Math.max(0, totalItems - itemsToShow);
+  const canGoPrevious = currentIndex > 0;
+  const canGoNext = currentIndex < maxIndex;
+  const shouldShowNavigation = totalItems > itemsToShow;
 
+  // Navigation functions
   const goToPrevious = () => {
-    setCurrentIndex((prev) => Math.max(0, prev - 1));
+    if (canGoPrevious && !isTransitioning) {
+      setIsTransitioning(true);
+      setCurrentIndex((prev) => prev - 1);
+      setTimeout(() => setIsTransitioning(false), 300);
+    }
   };
 
   const goToNext = () => {
-    setCurrentIndex((prev) => Math.min(maxIndex, prev + 1));
+    if (canGoNext && !isTransitioning) {
+      setIsTransitioning(true);
+      setCurrentIndex((prev) => prev + 1);
+      setTimeout(() => setIsTransitioning(false), 300);
+    }
   };
 
-  const canGoPrevious = effectiveIndex > 0;
-  const canGoNext = effectiveIndex < maxIndex && childrenArray.length > itemsToShow;
+  // Touch/swipe support
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
-  // Fix: Jika jumlah item <= itemsToShow, jangan tampilkan navigation
-  const showNavigation = childrenArray.length > itemsToShow;
+  const onTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe && canGoNext) {
+      goToNext();
+    }
+    if (isRightSwipe && canGoPrevious) {
+      goToPrevious();
+    }
+  };
+
+  // Calculate item width percentage
+  const itemWidthPercent = 100 / itemsToShow;
+  const translateX = currentIndex * itemWidthPercent;
 
   return (
-    <div className="mb-16">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h2 className="md:text-3xl text-xl font-bold text-gray-900 mb-2">{title}</h2>
-          {subtitle && <p className="text-gray-600">{subtitle}</p>}
+    <div className="w-full mb-16">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8 px-4 sm:px-0">
+        <div className="flex-1">
+          <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">{title}</h2>
+          {subtitle && <p className="hidden md:block text-sm md:text-base text-gray-600 max-w-2xl">{subtitle}</p>}
         </div>
 
-        {/* Navigation buttons - hanya tampil jika diperlukan */}
-        {showNavigation && (
-          <div className="flex space-x-2">
+        {/* Navigation Buttons */}
+        {shouldShowNavigation && (
+          <div className="flex items-center space-x-2 ml-4">
             <button
               onClick={goToPrevious}
-              disabled={!canGoPrevious}
-              className={`p-3 rounded-full border transition-all ${canGoPrevious ? "border-gray-300 hover:border-gray-400 text-gray-700 hover:bg-gray-50" : "border-gray-200 text-gray-300 cursor-not-allowed"}`}
+              disabled={!canGoPrevious || isTransitioning}
+              className={`
+                p-2 md:p-3 rounded-full border transition-all duration-200
+                ${canGoPrevious && !isTransitioning ? "border-gray-300 hover:border-gray-400 text-gray-700 hover:bg-gray-50 hover:shadow-sm" : "border-gray-200 text-gray-300 cursor-not-allowed"}
+              `}
+              aria-label="Previous items"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
             </button>
+
             <button
               onClick={goToNext}
-              disabled={!canGoNext}
-              className={`p-3 rounded-full border transition-all ${canGoNext ? "border-gray-300 hover:border-gray-400 text-gray-700 hover:bg-gray-50" : "border-gray-200 text-gray-300 cursor-not-allowed"}`}
+              disabled={!canGoNext || isTransitioning}
+              className={`
+                p-2 md:p-3 rounded-full border transition-all duration-200
+                ${canGoNext && !isTransitioning ? "border-gray-300 hover:border-gray-400 text-gray-700 hover:bg-gray-50 hover:shadow-sm" : "border-gray-200 text-gray-300 cursor-not-allowed"}
+              `}
+              aria-label="Next items"
             >
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
             </button>
           </div>
         )}
       </div>
 
-      <div className="overflow-hidden">
-        <div
-          className="flex transition-transform duration-300 ease-out"
-          style={{
-            // Fix: Transform yang konsisten untuk semua ukuran layar
-            transform: `translateX(-${effectiveIndex * (100 / itemsToShow)}%)`,
-            // Fix: Width container yang konsisten
-            width: `${(childrenArray.length * 100) / itemsToShow}%`,
-          }}
-        >
-          {childrenArray.map((child, index) => (
-            <div
-              key={index}
-              className="px-3 flex-shrink-0"
-              style={{
-                // Fix: Width per item yang konsisten
-                width: `${100 / childrenArray.length}%`,
-              }}
-            >
-              {child}
-            </div>
-          ))}
+      {/* Carousel Container */}
+      <div className="relative">
+        <div className="overflow-hidden" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
+          <div
+            className="flex transition-transform duration-300 ease-out"
+            style={{
+              transform: `translateX(-${translateX}%)`,
+            }}
+          >
+            {childrenArray.map((child, index) => (
+              <div
+                key={index}
+                className="flex-shrink-0 px-3"
+                style={{
+                  width: `${itemWidthPercent}%`,
+                }}
+              >
+                <div className="h-full">{child}</div>
+              </div>
+            ))}
+          </div>
         </div>
+
+        {/* Dots Indicator (optional, for mobile) */}
+        {shouldShowNavigation && itemsToShow === 1 && (
+          <div className="flex justify-center mt-6 space-x-2">
+            {Array.from({ length: maxIndex + 1 }).map((_, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  if (!isTransitioning) {
+                    setIsTransitioning(true);
+                    setCurrentIndex(index);
+                    setTimeout(() => setIsTransitioning(false), 300);
+                  }
+                }}
+                className={`
+                  w-2 h-2 rounded-full transition-all duration-200
+                  ${index === currentIndex ? "bg-blue-600 w-4" : "bg-gray-300 hover:bg-gray-400"}
+                `}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -234,12 +315,12 @@ export const BlogSectionClient: React.FC<BlogSectionClientProps> = ({ data }) =>
         <div className="mt-20">
           <div className="flex items-center justify-between mb-12">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Every Story So Far</h2>
-              <p className="text-gray-600">A little library of everything I&lsquo;ve written — from everyday thoughts to deeper reflections.</p>
+              <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">Every Story So Far</h2>
+              <p className="hidden md:block text-sm md:text-base text-gray-600 max-w-2xl">A little library of everything I&lsquo;ve written from everyday thoughts to deeper reflections.</p>
             </div>
 
             <button className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 font-medium">
-              <span>View All Categories</span>
+              <span>View All Blogs</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

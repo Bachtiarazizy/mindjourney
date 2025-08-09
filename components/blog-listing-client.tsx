@@ -177,16 +177,28 @@ export function BlogListingClient({ data }: BlogListingClientProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-[#4460a6] via-[#36539b] to-[#527ff0] text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div className="text-center" {...fadeInUp}>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-pink-100 bg-clip-text text-transparent">My Blog</h1>
-            <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
+      <section
+        className="relative text-white py-24 flex items-center"
+        style={{
+          backgroundImage: "url(/bd-bg.jpg)",
+          backgroundSize: "cover",
+          backgroundPosition: "bottom",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/70"></div>
+
+        {/* Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+          <div className="text-center flex flex-col items-center justify-center">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold max-w-3xl mb-8 leading-tight text-white">My Blog</h1>
+            <p className="text-medium md:text-lg text-white/90 max-w-3xl mb-12 leading-relaxed mx-auto">
               A small corner of the internet where I pour out stories, reflections, and quiet thoughts all shaped by my love for understanding people and the invisible threads that connect us.
             </p>
 
             {/* Search Bar */}
-            <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
+            <form onSubmit={handleSearch} className="max-w-2xl mx-auto w-full">
               <div className="relative">
                 <input
                   type="text"
@@ -200,7 +212,7 @@ export function BlogListingClient({ data }: BlogListingClientProps) {
                 </button>
               </div>
             </form>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -208,7 +220,7 @@ export function BlogListingClient({ data }: BlogListingClientProps) {
       {shouldShowFeatured && (
         <section className="py-16 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.h2 className="text-4xl font-bold text-gray-900 text-center mb-12" {...fadeInUp}>
+            <motion.h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-12" {...fadeInUp}>
               Featured Articles
             </motion.h2>
 
@@ -229,7 +241,7 @@ export function BlogListingClient({ data }: BlogListingClientProps) {
           {/* Filters and Results Header */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
             <div className="mb-4 lg:mb-0">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">{hasActiveFilters ? `Filtered Results (${data.pagination.totalPosts})` : `All Articles (${data.pagination.totalPosts})`}</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">{hasActiveFilters ? `Filtered Results (${data.pagination.totalPosts})` : `All Articles (${data.pagination.totalPosts})`}</h2>
 
               {/* Active Filters */}
               {hasActiveFilters && (
