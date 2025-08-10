@@ -1,6 +1,6 @@
 // app/api/comments/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { writeClient } from "@/sanity/write-client";
+import { writeClient } from "@/sanity/client";
 import { client } from "@/sanity/client";
 
 // GET - Fetch comments for a post

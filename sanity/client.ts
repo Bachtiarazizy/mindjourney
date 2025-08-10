@@ -49,6 +49,7 @@ export interface SiteSettings {
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "hzi0e4j9";
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
 const apiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION || "2023-05-03";
+const token = process.env.SANITY_WRITE_TOKEN || "skzdNFXjl6gTVyHwCY5sfSeGm4MzjPfzmDwPszao0F3zNVpuyeKU4VKyognApqJ9PnG5FwmQI11TxXYPZ0pdgMoUswSQzqPF4LDn2TK1a9eZsGTOAAVgMqAZV8vUXfLvMLpMDPlXoRys7bcCxYu5Bt89G2Lx60r8fjX6OA0czmGRFUy5xuhr";
 
 export const client = createClient({
   projectId,
@@ -71,6 +72,14 @@ export function urlForImage(source: unknown) {
     return null;
   }
 }
+
+export const writeClient = createClient({
+  projectId,
+  dataset,
+  apiVersion,
+  token,
+  useCdn: false, // Don't use CDN for writes
+});
 
 // Test connection function
 export async function testConnection() {
