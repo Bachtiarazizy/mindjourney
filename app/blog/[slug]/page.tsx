@@ -9,9 +9,11 @@ import Image from "next/image";
 import { Calendar, Clock, ArrowLeft, Star, Lock, Instagram, Twitter, Linkedin, Globe, Tag } from "lucide-react";
 import { RelatedPosts } from "@/components/related-post";
 import { ShareButtons } from "@/components/share-button";
+import { CommentsSection } from "@/components/comments-section";
 
 const POST_QUERY = `*[_type == "post" && slug.current == $slug][0] {
-  title,
+_id,  
+title,
   excerpt,
   slug,
   mainImage,
@@ -238,6 +240,10 @@ export default async function PostPage({ params }: { params: { slug: string } })
                 </div>
               </div>
             )}
+
+            <div className="border-t border-gray-300 pt-12 mt-12">
+              <CommentsSection postId={post._id} postSlug={post.slug.current} postTitle={post.title} />
+            </div>
           </div>
 
           {/* Sidebar */}
