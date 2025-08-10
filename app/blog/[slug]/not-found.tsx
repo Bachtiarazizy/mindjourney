@@ -46,7 +46,7 @@ export default function BlogNotFound() {
         {/* Footer Message */}
         <p className="text-xs text-gray-500 mt-6">
           If you believe this is an error, please{" "}
-          <Link href="/contact" className="text-pink-500 hover:text-pink-600 underline">
+          <Link href="/" className="text-pink-500 hover:text-pink-600 underline">
             let us know
           </Link>
         </p>
