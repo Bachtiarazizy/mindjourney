@@ -1,5 +1,4 @@
 import BlogSection from "@/components/blog-section";
-import CategorySection from "@/components/category-section";
 import Hero from "@/components/hero";
 import React from "react";
 
@@ -8,7 +7,7 @@ const BlogLanding = async () => {
     <div className="min-h-screen bg-gray-50">
       <Hero />
       <BlogSection />
-      <CategorySection searchParams={{}} />
+      {/* <CategorySection searchParams={{}} /> */}
     </div>
   );
 };
