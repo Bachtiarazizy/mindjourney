@@ -3,7 +3,7 @@
 
 import React, { useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Search, Filter, ChevronLeft, ChevronRight, Tag, X } from "lucide-react";
+import { Filter, ChevronLeft, ChevronRight, Tag, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { BlogCard } from "@/components/blog-card";
@@ -68,18 +68,18 @@ interface AvailableFilters {
 
 interface BlogListingData {
   posts: BlogPost[];
-  featuredPosts: BlogPost[];
   categories: Category[];
   pagination: Pagination;
   filters: Filters;
   availableFilters: AvailableFilters;
 }
 
-interface BlogListingClientProps {
+interface CategorySectionClientProps {
   data: BlogListingData;
 }
 
-export function BlogListingClient({ data }: BlogListingClientProps) {
+export function CategorySectionClient({ data }: CategorySectionClientProps) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [searchTerm, setSearchTerm] = useState(data.filters.searchTerm);
   const [showFilters, setShowFilters] = useState(false);
   const router = useRouter();
@@ -121,11 +121,6 @@ export function BlogListingClient({ data }: BlogListingClientProps) {
     },
     [router, searchParams]
   );
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    updateUrlParams({ search: searchTerm });
-  };
 
   const handleCategoryFilter = (categorySlug: string) => {
     updateUrlParams({ category: categorySlug || null });
@@ -172,69 +167,9 @@ export function BlogListingClient({ data }: BlogListingClientProps) {
   };
 
   const hasActiveFilters = data.filters.selectedCategory || data.filters.searchTerm || data.filters.selectedTag || data.filters.selectedAuthor;
-  const shouldShowFeatured = !hasActiveFilters && data.pagination.currentPage === 1 && data.featuredPosts.length > 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section
-        className="relative text-white py-24 flex items-center"
-        style={{
-          backgroundImage: "url(/bd-bg.jpg)",
-          backgroundSize: "cover",
-          backgroundPosition: "bottom",
-          backgroundRepeat: "no-repeat",
-        }}
-      >
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/70"></div>
-
-        {/* Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="text-center flex flex-col items-center justify-center">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold max-w-3xl mb-8 leading-tight text-white">My Blog</h1>
-            <p className="text-medium md:text-lg text-white/90 max-w-3xl mb-12 leading-relaxed mx-auto">
-              A small corner of the internet where I pour out stories, reflections, and quiet thoughts all shaped by my love for understanding people and the invisible threads that connect us.
-            </p>
-
-            {/* Search Bar */}
-            <form onSubmit={handleSearch} className="max-w-2xl mx-auto w-full">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search articles..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-6 py-4 pr-14 rounded-full text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white/30 shadow-lg"
-                />
-                <button type="submit" className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-pink-500 text-white p-2 rounded-full hover:bg-pink-600 transition-colors shadow-md">
-                  <Search className="w-5 h-5" />
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Posts */}
-      {shouldShowFeatured && (
-        <section className="py-16 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-12" {...fadeInUp}>
-              Featured Articles
-            </motion.h2>
-
-            <motion.div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8" variants={staggerChildren} initial="initial" whileInView="animate" viewport={{ once: true }}>
-              {data.featuredPosts.slice(0, 6).map((post) => (
-                <motion.div key={post.id} variants={fadeInUp}>
-                  <BlogCard post={post} variant="compact" />
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-        </section>
-      )}
-
+    <div className="min-h-screen bg-white">
       {/* Main Content */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

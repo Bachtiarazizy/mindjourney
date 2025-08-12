@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowRight, Tag } from "lucide-react";
 import { BlogCard } from "./blog-card";
 
 interface Author {
@@ -33,11 +34,19 @@ interface BlogPost {
   premium: boolean;
 }
 
+interface Category {
+  id: string;
+  title: string;
+  slug: string;
+  color: string;
+  icon: string | null;
+  postCount: number;
+  description?: string;
+}
+
 interface BlogData {
-  featuredPosts: BlogPost[];
-  recommendedPosts: BlogPost[];
-  favoritePosts: BlogPost[];
-  allPosts: BlogPost[];
+  latestPosts: BlogPost[];
+  categories: Category[];
   pagination: {
     currentPage: number;
     totalPosts: number;
@@ -156,36 +165,36 @@ const Carousel: React.FC<{
     <div className="w-full mb-16">
       {/* Header */}
       <div className="flex items-center justify-between mb-8 px-4 sm:px-0">
-        <div className="flex-1">
-          <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">{title}</h2>
-          {subtitle && <p className="hidden md:block text-sm md:text-base text-gray-600 max-w-2xl">{subtitle}</p>}
+        <div className="flex-1 text-left">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">{title}</h2>
+          {subtitle && <p className="text-gray-600 text-lg max-w-3xl leading-relaxed text-left">{subtitle}</p>}
         </div>
 
         {/* Navigation Buttons */}
         {shouldShowNavigation && (
-          <div className="flex items-center space-x-2 ml-4">
+          <div className="flex items-center space-x-3 ml-4">
             <button
               onClick={goToPrevious}
               disabled={!canGoPrevious || isTransitioning}
               className={`
-                p-2 md:p-3 rounded-full border transition-all duration-200
-                ${canGoPrevious && !isTransitioning ? "border-gray-300 hover:border-gray-400 text-gray-700 hover:bg-gray-50 hover:shadow-sm" : "border-gray-200 text-gray-300 cursor-not-allowed"}
+                p-3 rounded-full border-2 transition-all duration-200
+                ${canGoPrevious && !isTransitioning ? "border-gray-300 hover:border-blue-400 text-gray-700 hover:bg-blue-50 hover:shadow-md" : "border-gray-200 text-gray-300 cursor-not-allowed"}
               `}
               aria-label="Previous items"
             >
-              <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
+              <ChevronLeft className="w-5 h-5" />
             </button>
 
             <button
               onClick={goToNext}
               disabled={!canGoNext || isTransitioning}
               className={`
-                p-2 md:p-3 rounded-full border transition-all duration-200
-                ${canGoNext && !isTransitioning ? "border-gray-300 hover:border-gray-400 text-gray-700 hover:bg-gray-50 hover:shadow-sm" : "border-gray-200 text-gray-300 cursor-not-allowed"}
+                p-3 rounded-full border-2 transition-all duration-200
+                ${canGoNext && !isTransitioning ? "border-gray-300 hover:border-blue-400 text-gray-700 hover:bg-blue-50 hover:shadow-md" : "border-gray-200 text-gray-300 cursor-not-allowed"}
               `}
               aria-label="Next items"
             >
-              <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
+              <ChevronRight className="w-5 h-5" />
             </button>
           </div>
         )}
@@ -214,7 +223,7 @@ const Carousel: React.FC<{
           </div>
         </div>
 
-        {/* Dots Indicator (optional, for mobile) */}
+        {/* Dots Indicator (for mobile) */}
         {shouldShowNavigation && itemsToShow === 1 && (
           <div className="flex justify-center mt-6 space-x-2">
             {Array.from({ length: maxIndex + 1 }).map((_, index) => (
@@ -228,8 +237,8 @@ const Carousel: React.FC<{
                   }
                 }}
                 className={`
-                  w-2 h-2 rounded-full transition-all duration-200
-                  ${index === currentIndex ? "bg-blue-600 w-4" : "bg-gray-300 hover:bg-gray-400"}
+                  w-3 h-3 rounded-full transition-all duration-200
+                  ${index === currentIndex ? "bg-blue-600 scale-110" : "bg-gray-300 hover:bg-gray-400"}
                 `}
                 aria-label={`Go to slide ${index + 1}`}
               />
@@ -241,99 +250,50 @@ const Carousel: React.FC<{
   );
 };
 
-const Pagination: React.FC<{
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-}> = ({ currentPage, totalPages, onPageChange }) => {
-  const getPageNumbers = () => {
-    const pages = [];
-    const showPages = 5;
-    let start = Math.max(1, currentPage - Math.floor(showPages / 2));
-    const end = Math.min(totalPages, start + showPages - 1);
-
-    if (end - start + 1 < showPages) {
-      start = Math.max(1, end - showPages + 1);
-    }
-
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-    return pages;
-  };
-
+const CategoryCard: React.FC<{ category: Category }> = ({ category }) => {
   return (
-    <div className="flex items-center justify-center space-x-2 mt-12">
-      <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage <= 1} className={`p-2 rounded-lg ${currentPage <= 1 ? "text-gray-400 cursor-not-allowed" : "text-gray-700 hover:bg-gray-100"}`}>
-        <ChevronLeft className="w-5 h-5" />
-      </button>
+    <div className="group">
+      <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-gray-200 h-full cursor-pointer">
+        <div className="flex items-center justify-between mb-4">
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${category.color}20` }}>
+            {category.icon ? <img src={category.icon} alt={category.title} className="w-6 h-6" /> : <Tag className="w-6 h-6" style={{ color: category.color }} />}
+          </div>
+          <span
+            className="text-sm font-medium px-3 py-1 rounded-full"
+            style={{
+              backgroundColor: `${category.color}15`,
+              color: category.color,
+            }}
+          >
+            {category.postCount} artikel
+          </span>
+        </div>
 
-      {getPageNumbers().map((page) => (
-        <button key={page} onClick={() => onPageChange(page)} className={`px-4 py-2 rounded-lg font-medium ${page === currentPage ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-gray-100"}`}>
-          {page}
-        </button>
-      ))}
+        <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">{category.title}</h3>
 
-      <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage >= totalPages} className={`p-2 rounded-lg ${currentPage >= totalPages ? "text-gray-400 cursor-not-allowed" : "text-gray-700 hover:bg-gray-100"}`}>
-        <ChevronRight className="w-5 h-5" />
-      </button>
+        {category.description && <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">{category.description}</p>}
+
+        <div className="mt-4 flex items-center text-blue-600 font-medium text-sm group-hover:translate-x-1 transition-transform">
+          <span>Lihat artikel</span>
+          <ArrowRight className="w-4 h-4 ml-1" />
+        </div>
+      </div>
     </div>
   );
 };
 
 export const BlogSectionClient: React.FC<BlogSectionClientProps> = ({ data }) => {
-  const [currentPage, setCurrentPage] = useState(data.pagination.currentPage);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    // In a real app, you'd update the URL and refetch data
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   return (
-    <section className="py-20 bg-gray-50">
+    <section className="py-24 bg-gray-50">
       <div className="max-w-7xl mx-auto px-6">
-        {/* Featured Posts Carousel */}
-        {data.featuredPosts.length > 0 && (
-          <Carousel title="What I'm Excited to Share" subtitle="The pieces I can't wait for you to read right now." itemsPerView={3}>
-            {data.featuredPosts.map((post) => (
+        {/* Latest Posts Carousel */}
+        {data.latestPosts.length > 0 && (
+          <Carousel title="Tulisan terbaru untuk kamu" subtitle="" itemsPerView={3}>
+            {data.latestPosts.map((post) => (
               <BlogCard key={post.id} post={post} variant="compact" />
             ))}
           </Carousel>
         )}
-
-        {/* Favorite Posts Carousel */}
-        {data.favoritePosts.length > 0 && (
-          <Carousel title="Close to My Heart" subtitle="Stories and reflections that mean the most to me (and, I hope, to you too)." itemsPerView={4}>
-            {data.favoritePosts.map((post) => (
-              <BlogCard key={post.id} post={post} variant="compact" />
-            ))}
-          </Carousel>
-        )}
-
-        {/* All Posts Grid */}
-        <div className="mt-20">
-          <div className="flex items-center justify-between mb-12">
-            <div>
-              <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">Every Story So Far</h2>
-              <p className="hidden md:block text-sm md:text-base text-gray-600 max-w-2xl">A little library of everything I&lsquo;ve written from everyday thoughts to deeper reflections.</p>
-            </div>
-
-            <button className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 font-medium">
-              <span>View All Blogs</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {data.allPosts.map((post) => (
-              <BlogCard key={post.id} post={post} variant="compact" />
-            ))}
-          </div>
-
-          {/* Pagination */}
-          {data.pagination.totalPages > 1 && <Pagination currentPage={currentPage} totalPages={data.pagination.totalPages} onPageChange={handlePageChange} />}
-        </div>
       </div>
     </section>
   );

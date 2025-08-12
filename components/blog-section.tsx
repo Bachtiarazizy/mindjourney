@@ -4,8 +4,8 @@ import { client, urlForImage } from "@/sanity/client";
 import { type SanityDocument } from "next-sanity";
 import { BlogSectionClient } from "./blog-section-client";
 
-// Enhanced queries matching your schema
-const FEATURED_POSTS_QUERY = `*[_type == "post" && featured == true] | order(publishedAt desc)[0...6]{
+// Query for latest posts
+const LATEST_POSTS_QUERY = `*[_type == "post"] | order(publishedAt desc)[0...9]{
   _id,
   title,
   excerpt,
@@ -30,98 +30,21 @@ const FEATURED_POSTS_QUERY = `*[_type == "post" && featured == true] | order(pub
   publishedAt,
   readTime,
   tags,
+  featured,
+  recommended,
+  favorite,
   premium
 }`;
 
-const RECOMMENDED_POSTS_QUERY = `*[_type == "post" && recommended == true] | order(publishedAt desc)[0...8]{
+// Query for categories with post count
+const CATEGORIES_QUERY = `*[_type == "category"] | order(title asc){
   _id,
   title,
-  excerpt,
   slug,
-  mainImage{
-    asset,
-    alt
-  },
-  category->{
-    title,
-    slug,
-    color,
-    icon
-  },
-  author->{
-    name,
-    slug,
-    image,
-    jobTitle,
-    shortBio
-  },
-  publishedAt,
-  readTime,
-  tags,
-  premium
-}`;
-
-const FAVORITE_POSTS_QUERY = `*[_type == "post" && favorite == true] | order(publishedAt desc)[0...12]{
-  _id,
-  title,
-  excerpt,
-  slug,
-  mainImage{
-    asset,
-    alt
-  },
-  category->{
-    title,
-    slug,
-    color,
-    icon
-  },
-  author->{
-    name,
-    slug,
-    image,
-    jobTitle,
-    shortBio
-  },
-  publishedAt,
-  readTime,
-  tags,
-  premium
-}`;
-
-// Query for all posts with pagination support
-const ALL_POSTS_QUERY = `{
-  "posts": *[_type == "post"] | order(publishedAt desc)[$start...$end]{
-    _id,
-    title,
-    excerpt,
-    slug,
-    mainImage{
-      asset,
-      alt
-    },
-    category->{
-      title,
-      slug,
-      color,
-      icon
-    },
-    author->{
-      name,
-      slug,
-      image,
-      jobTitle,
-      shortBio
-    },
-    publishedAt,
-    readTime,
-    tags,
-    featured,
-    recommended,
-    favorite,
-    premium
-  },
-  "total": count(*[_type == "post"])
+  color,
+  icon,
+  description,
+  "postCount": count(*[_type == "post" && references(^._id)])
 }`;
 
 const options = { next: { revalidate: 30 } };
@@ -132,16 +55,8 @@ interface BlogSectionProps {
 }
 
 export default async function BlogSection({ page = 1, postsPerPage = 12 }: BlogSectionProps) {
-  const start = (page - 1) * postsPerPage;
-  const end = start + postsPerPage;
-
-  // Fetch all blog data server-side
-  const [featuredPosts, recommendedPosts, favoritePosts, allPostsData] = await Promise.all([
-    client.fetch<SanityDocument[]>(FEATURED_POSTS_QUERY, {}, options),
-    client.fetch<SanityDocument[]>(RECOMMENDED_POSTS_QUERY, {}, options),
-    client.fetch<SanityDocument[]>(FAVORITE_POSTS_QUERY, {}, options),
-    client.fetch<{ posts: SanityDocument[]; total: number }>(ALL_POSTS_QUERY, { start, end }, options),
-  ]);
+  // Fetch latest posts and categories
+  const [latestPosts, categories] = await Promise.all([client.fetch<SanityDocument[]>(LATEST_POSTS_QUERY, {}, options), client.fetch<SanityDocument[]>(CATEGORIES_QUERY, {}, options)]);
 
   // Helper function for image URLs with alt text
   const getImageUrl = (imageAsset: any) => {
@@ -175,7 +90,7 @@ export default async function BlogSection({ page = 1, postsPerPage = 12 }: BlogS
 
   // Helper function to format date
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("id-ID", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -187,14 +102,16 @@ export default async function BlogSection({ page = 1, postsPerPage = 12 }: BlogS
     if (category?.color?.hex) return category.color.hex;
     // Fallback colors based on category title
     const colorMap: { [key: string]: string } = {
-      BEAUTY: "#FF6B9D",
-      SKINCARE: "#4ECDC4",
-      MAKEUP: "#FFE66D",
-      WELLNESS: "#95E1D3",
-      LIFESTYLE: "#A8E6CF",
-      REVIEWS: "#FF8B94",
-      TUTORIALS: "#B4A7D6",
-      TRENDS: "#FFAAA5",
+      PSIKOLOGI: "#8B5CF6",
+      "KESEHATAN MENTAL": "#10B981",
+      "PENGEMBANGAN DIRI": "#F59E0B",
+      REFLEKSI: "#EF4444",
+      KONSELING: "#3B82F6",
+      MINDFULNESS: "#8B5CF6",
+      HUBUNGAN: "#EC4899",
+      MOTIVASI: "#F97316",
+      JURNAL: "#6366F1",
+      CERITA: "#14B8A6",
     };
     return colorMap[category?.title?.toUpperCase()] || "#6366F1";
   };
@@ -202,14 +119,14 @@ export default async function BlogSection({ page = 1, postsPerPage = 12 }: BlogS
   // Transform post data
   const transformPost = (post: SanityDocument) => ({
     id: post._id,
-    category: post.category?.title?.toUpperCase() || "GENERAL",
+    category: post.category?.title || "Umum",
     categoryColor: getCategoryColor(post.category),
     categoryIcon: getCategoryIconUrl(post.category?.icon),
     title: post.title || "",
     description: post.excerpt || "",
     author: {
-      name: post.author?.name || "Anonymous",
-      jobTitle: post.author?.jobTitle || "",
+      name: post.author?.name || "Azka",
+      jobTitle: post.author?.jobTitle || "Mahasiswa Psikologi",
       shortBio: post.author?.shortBio || "",
       image: getAvatarUrl(post.author?.image),
       slug: post.author?.slug?.current || "",
@@ -226,17 +143,26 @@ export default async function BlogSection({ page = 1, postsPerPage = 12 }: BlogS
     premium: post.premium || false,
   });
 
+  // Transform category data
+  const transformCategory = (category: SanityDocument) => ({
+    id: category._id,
+    title: category.title || "",
+    slug: category.slug?.current || "",
+    color: getCategoryColor(category),
+    icon: getCategoryIconUrl(category.icon),
+    postCount: category.postCount || 0,
+    description: category.description || `Kumpulan artikel tentang ${category.title?.toLowerCase()}`,
+  });
+
   // Transform data for client component
   const blogData = {
-    featuredPosts: featuredPosts?.map(transformPost) || [],
-    recommendedPosts: recommendedPosts?.map(transformPost) || [],
-    favoritePosts: favoritePosts?.map(transformPost) || [],
-    allPosts: allPostsData?.posts?.map(transformPost) || [],
+    latestPosts: latestPosts?.map(transformPost) || [],
+    categories: categories?.filter((cat: any) => cat.postCount > 0).map(transformCategory) || [],
     pagination: {
       currentPage: page,
-      totalPosts: allPostsData?.total || 0,
+      totalPosts: latestPosts?.length || 0,
       postsPerPage,
-      totalPages: Math.ceil((allPostsData?.total || 0) / postsPerPage),
+      totalPages: Math.ceil((latestPosts?.length || 0) / postsPerPage),
     },
   };
 
