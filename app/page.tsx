@@ -3,7 +3,7 @@ import CategorySection from "@/components/category-section";
 import Hero from "@/components/hero";
 import React, { Suspense } from "react";
 
-const Home = async () => {
+const Home = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Hero />

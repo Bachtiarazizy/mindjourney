@@ -5,7 +5,7 @@ import { client, urlForImage } from "@/sanity/client";
 import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { Mail, Heart, Coffee, Sparkles } from "lucide-react";
+import { Mail, Heart, Coffee, Sparkles, Instagram, Facebook, Twitter, Linkedin, ExternalLink } from "lucide-react";
 
 // Query untuk mengambil author utama (bisa berdasarkan featured atau yang pertama)
 const AUTHOR_QUERY = `*[_type == "author"] | order(featured desc, _createdAt asc)[0] {
@@ -42,6 +42,27 @@ export const metadata: Metadata = {
   },
 };
 
+// Helper function to get social media icon
+const getSocialIcon = (platform: string) => {
+  switch (platform.toLowerCase()) {
+    case "instagram":
+      return <Instagram className="w-5 h-5" />;
+    case "facebook":
+      return <Facebook className="w-5 h-5" />;
+    case "twitter":
+      return <Twitter className="w-5 h-5" />;
+    case "linkedin":
+      return <Linkedin className="w-5 h-5" />;
+    default:
+      return <ExternalLink className="w-5 h-5" />;
+  }
+};
+
+// Helper function to format platform name
+const formatPlatformName = (platform: string) => {
+  return platform.charAt(0).toUpperCase() + platform.slice(1);
+};
+
 export default async function AboutPage() {
   const [author, stats] = await Promise.all([client.fetch<SanityDocument>(AUTHOR_QUERY, {}, options), client.fetch<any>(STATS_QUERY, {}, options)]);
 
@@ -60,32 +81,11 @@ export default async function AboutPage() {
 
   const authorImageUrl = author.image ? urlForImage(author.image)?.url() : null;
 
+  // Check if social data exists and has content
+  const hasSocialLinks = author.social && Object.keys(author.social).some((key) => author.social[key]);
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section
-        className="relative text-white py-24 flex items-center"
-        style={{
-          backgroundImage: "url(/bd-bg.jpg)",
-          backgroundSize: "cover",
-          backgroundPosition: "bottom",
-          backgroundRepeat: "no-repeat",
-        }}
-      >
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/70"></div>
-
-        {/* Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="text-center flex flex-col items-center justify-center">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold max-w-3xl mb-8 leading-tight text-white">About Me</h1>
-            <p className="text-medium md:text-lg text-white/90 max-w-3xl mb-12 leading-relaxed mx-auto">
-              A small corner of the internet where I pour out stories, reflections, and quiet thoughts all shaped by my love for understanding people and the invisible threads that connect us.
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* About Content */}
       <section className="py-16 lg:py-24 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -191,13 +191,23 @@ export default async function AboutPage() {
                   </Link>
                 </div>
 
-                {/* Social Links (jika ada) */}
-                {author.social && (
+                {/* Social Links */}
+                {hasSocialLinks && (
                   <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
                     <h3 className="text-lg font-bold mb-4 text-gray-900">Follow Me</h3>
-                    <div className="space-y-2">
-                      {/* Add social media links here based on author.social data */}
-                      <p className="text-sm text-gray-600">Social media links coming soon!</p>
+                    <div className="space-y-3">
+                      {Object.entries(author.social).map(([platform, url]) => {
+                        // Skip empty values
+                        if (!url || typeof url !== "string") return null;
+
+                        return (
+                          <Link key={platform} href={url} target="_blank" rel="noopener noreferrer" className="flex items-center text-gray-700 hover:text-pink-600 transition-colors group">
+                            <span className="w-8 h-8 bg-white rounded-lg flex items-center justify-center mr-3 group-hover:bg-pink-50 transition-colors shadow-sm">{getSocialIcon(platform)}</span>
+                            <span className="font-medium">{formatPlatformName(platform)}</span>
+                            <ExternalLink className="w-3 h-3 ml-auto opacity-50 group-hover:opacity-100" />
+                          </Link>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

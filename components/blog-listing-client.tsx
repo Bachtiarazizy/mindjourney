@@ -194,7 +194,7 @@ export function BlogListingClient({ data }: BlogListingClientProps) {
           <div className="text-center flex flex-col items-center justify-center">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold max-w-3xl mb-8 leading-tight text-white">My Blog</h1>
             <p className="text-medium md:text-lg text-white/90 max-w-3xl mb-12 leading-relaxed mx-auto">
-              A small corner of the internet where I pour out stories, reflections, and quiet thoughts all shaped by my love for understanding people and the invisible threads that connect us.
+              Sebagai manusia yang juga sering tersandung dalam perjalanan hidup, sudut kecil ini kutulis untuk berbagi cerita, refleksi, dan pemikiran tentang proses bertumbuh - dengan segala ketidaksempurnaannya. Mari bertumbuh bersama.
             </p>
 
             {/* Search Bar */}
