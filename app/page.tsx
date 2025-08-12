@@ -1,15 +1,18 @@
 import BlogSection from "@/components/blog-section";
+import CategorySection from "@/components/category-section";
 import Hero from "@/components/hero";
-import React from "react";
+import React, { Suspense } from "react";
 
-const BlogLanding = async () => {
+const Home = async () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Hero />
       <BlogSection />
-      {/* <CategorySection searchParams={{}} /> */}
+      <Suspense fallback={<div>Loading categories...</div>}>
+        <CategorySection searchParams={{}} />
+      </Suspense>
     </div>
   );
 };
 
-export default BlogLanding;
+export default Home;
