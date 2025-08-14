@@ -5,7 +5,7 @@ import { type SanityDocument } from "next-sanity";
 import { Metadata } from "next";
 import { BlogListingClient } from "@/components/blog-listing-client";
 
-const CATEGORIES_QUERY = `*[_type == "category"] | order(title asc) {
+const CATEGORIES_QUERY = `*[_type == "category"] | order(title desc) {
   title,
   slug,
   color,

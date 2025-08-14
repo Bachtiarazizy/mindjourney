@@ -37,7 +37,7 @@ const SITE_SETTINGS_QUERY = `*[_type == "siteSettings"][0]{
   }
 }`;
 
-const CATEGORIES_QUERY = `*[_type == "category"] | order(title asc) {
+const CATEGORIES_QUERY = `*[_type == "category"] | order(title desc) {
   title,
   "slug": slug.current
 }`;

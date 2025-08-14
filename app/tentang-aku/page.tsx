@@ -5,7 +5,7 @@ import { client, urlForImage } from "@/sanity/client";
 import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { Mail, Heart, Coffee, Sparkles, Instagram, Facebook, Twitter, Linkedin, ExternalLink } from "lucide-react";
+import { Mail, Heart, Instagram, Facebook, Twitter, Linkedin, ExternalLink, Footprints, HandHeart } from "lucide-react";
 
 // Query untuk mengambil author utama (bisa berdasarkan featured atau yang pertama)
 const AUTHOR_QUERY = `*[_type == "author"] | order(featured desc, _createdAt asc)[0] {
@@ -110,7 +110,6 @@ export default async function AboutPage() {
                 {/* Profile Info */}
                 <div className="flex-1">
                   <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 leading-tight text-gray-900">
-                    Hai, aku <br className="hidden sm:block" />
                     <span className="text-pink-600">{author.name}</span>
                   </h1>
 
@@ -156,25 +155,22 @@ export default async function AboutPage() {
                   </h3>
                   <div className="space-y-3">
                     <div className="flex items-center text-gray-700">
-                      <Coffee className="w-4 h-4 mr-3 text-pink-600 flex-shrink-0" />
-                      <span>Coffee enthusiast</span>
+                      <Footprints className="w-4 h-4 mr-3 text-pink-600 flex-shrink-0" />
+                      <span>senang mengeksplorasi budaya baru</span>
                     </div>
                     <div className="flex items-center text-gray-700">
-                      <Sparkles className="w-4 h-4 mr-3 text-pink-600 flex-shrink-0" />
-                      <span>Social Volunteer</span>
+                      <HandHeart className="w-4 h-4 mr-3 text-pink-600 flex-shrink-0" />
+                      <span>volunteeran buat ngisi energi sosial</span>
                     </div>
 
                     {/* Blog Stats */}
-                    {stats.totalPosts > 0 && (
-                      <div className="pt-3 border-t border-pink-200">
-                        <p className="text-sm text-gray-600 mb-1">Blog posts written:</p>
-                        <p className="font-semibold text-pink-900">{stats.totalPosts} articles</p>
-                      </div>
-                    )}
+                    <div className="pt-3 border-t border-pink-200">
+                      <p className="text-sm text-gray-600 mb-1">Growth is messy. but so is baklava-and we all love that</p>
+                    </div>
 
                     {stats.latestPost && (
                       <div className="pt-3 border-t border-pink-200">
-                        <p className="text-sm text-gray-600 mb-1">Latest post:</p>
+                        <p className="text-sm text-gray-600 mb-1">Tulisan terbaru</p>
                         <p className="font-medium text-pink-900 text-sm leading-tight">{stats.latestPost.title}</p>
                       </div>
                     )}
@@ -184,7 +180,7 @@ export default async function AboutPage() {
                 {/* Contact Card */}
                 <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-6 text-white shadow-lg">
                   <h3 className="text-xl font-bold mb-3">Let&apos;s Connect!</h3>
-                  <p className="mb-4 text-white/90 text-sm leading-relaxed">Have a question or want to collaborate? I&apos;d love to hear from you!</p>
+                  <p className="mb-4 text-white/90 text-sm leading-relaxed">Punya pertanyaan atau ingin berbagi cerita?</p>
                   <Link href="mailto:azkamusfirah@gmail.com" className="bg-white text-purple-600 px-4 py-2 rounded-xl font-semibold hover:bg-gray-100 transition-all duration-200 inline-flex items-center text-sm hover:shadow-md">
                     <Mail className="w-4 h-4 mr-2" />
                     Get in Touch

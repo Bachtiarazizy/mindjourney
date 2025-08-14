@@ -70,8 +70,8 @@ export default function Footer() {
                   <Link href="/blog" className="text-blue-100 hover:text-white transition-colors duration-300 hover:underline">
                     Blog
                   </Link>
-                  <Link href="/kenalan-yuk" className="text-blue-100 hover:text-white transition-colors duration-300 hover:underline">
-                    About
+                  <Link href="/tentang-aku" className="text-blue-100 hover:text-white transition-colors duration-300 hover:underline">
+                    Tentang aku
                   </Link>
                 </div>
               </div>
@@ -89,6 +89,8 @@ export default function Footer() {
 
                 <motion.a
                   href="mailto:azkamusfirah@gmail.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center space-x-3 bg-white/10 backdrop-blur-sm border border-white/20 px-6 py-3 rounded-xl hover:bg-white/20 transition-all duration-300 group"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -105,7 +107,9 @@ export default function Footer() {
 
               <div className="flex flex-wrap gap-4">
                 <motion.a
-                  href="#"
+                  href="https://www.instagram.com/azkamsf_"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="group relative w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl flex items-center justify-center overflow-hidden shadow-lg"
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   whileTap={{ scale: 0.9 }}
@@ -115,7 +119,9 @@ export default function Footer() {
                 </motion.a>
 
                 <motion.a
-                  href="#"
+                  href="https://www.linkedin.com/in/azka-musfirah"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="group relative w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center overflow-hidden shadow-lg"
                   whileHover={{ scale: 1.1, rotate: -5 }}
                   whileTap={{ scale: 0.9 }}
