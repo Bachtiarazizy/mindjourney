@@ -172,7 +172,7 @@ const Carousel: React.FC<{
 
         {/* Navigation Buttons */}
         {shouldShowNavigation && (
-          <div className="flex items-center space-x-3 ml-4">
+          <div className="hidden md:flex items-center space-x-3 ml-4">
             <button
               onClick={goToPrevious}
               disabled={!canGoPrevious || isTransitioning}

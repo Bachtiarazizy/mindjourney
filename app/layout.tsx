@@ -21,7 +21,7 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: "Mindjourneyme | A journal of Growing through it",
-  description: "Explore the latest articles on business, beauty, technology, and more. Stay updated with insights and trends.",
+  description: "Jurnal perjalananku memahami diri, orang lain, dan kehidupan. Semoga setiap tulisanku di sini bisa menjadi cermin atau pelukan kecil untukmu.",
 };
 
 export default function RootLayout({
